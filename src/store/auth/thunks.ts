@@ -1,7 +1,8 @@
 import { RegisterFetchProps, LoginFetchProps, LoginValuesProps, RegisterValuesProps } from './../../interfaces/public'; "../../interfaces";
 import { checkingCredentials, login, logout } from "./authSlice";
 import { AppDispatch } from '../store';
-import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export const startRegisteringWithEmailAndPassword = ({ email, password, name }: RegisterValuesProps) => {
   return async (dispatch: AppDispatch) => {
@@ -20,10 +21,13 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name }: 
       const data: RegisterFetchProps = await response.json() as RegisterFetchProps;
 
       if (!data.ok) {
+        toast.error(data.message);
         return dispatch(logout(data));
       }
 
       localStorage.setItem('token', data.token!);
+
+      toast.success(data.message);
 
       dispatch(login(data));
     } catch (error) {
@@ -50,10 +54,13 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
       const data: LoginFetchProps = await response.json() as LoginFetchProps;
 
       if (!data.ok) {
-        Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+        toast.error(data.message);
         return dispatch(logout(data));
       }
       localStorage.setItem('token', data.token!);
+
+      toast.success(data.message);
+
       dispatch(login(data))
     } catch (error) {
       console.error('Error durante el login:', error);

@@ -6,13 +6,15 @@ export const validateRegister = (values: RegisterValuesProps)=> {
   if (!values.name) {
     errors.name = "El nombre es requerido";
   } else if (values.name.length < 2) {
-    errors.name = "El nombre debe tener al menos 2 caracteres";
+    errors.name = "El nombre debe tener al menos dos caracteres";
   }
 
   if (!values.email) {
     errors.email = "El email es requerido";
   } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
     errors.email = "El email no es válido";
+  } else if (!values.email.endsWith("@gmail.com")) {
+    errors.email = "El email debe ser de Gmail";
   }
   
   if (!values.password) {

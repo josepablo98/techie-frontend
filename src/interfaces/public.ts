@@ -27,3 +27,12 @@ export interface LoginFetchProps {
   message?: string;
   token?: string;
 }
+
+export interface RequestPasswordResetValuesProps {
+  email: string;
+}
+
+export interface ResetPasswordValuesProps {
+  newPassword: string;
+  confirmPassword: string;
+}

@@ -5,7 +5,7 @@ import { startRegisteringWithEmailAndPassword } from "../store/auth";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
 import { motion } from "framer-motion";
-import { validateRegister } from "../validators/validateRegister";
+import { validateRegister } from "../validators";
 
 const initialState: RegisterValuesProps = {
   name: '',
@@ -46,7 +46,7 @@ export const RegisterPage = () => {
           </div>
           <div>
             <input
-              type="email"
+              type="text"
               placeholder="Email"
               name="email"
               value={email}

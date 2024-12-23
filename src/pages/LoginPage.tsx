@@ -72,6 +72,9 @@ export const LoginPage = () => {
         <NavLink to="/register" className="block text-center text-blue-500 hover:underline">
           ¿No tienes cuenta?
         </NavLink>
+        <NavLink to="/request-password-reset" className="block text-center text-blue-500 hover:underline">
+          ¿Has olvidado la contraseña?
+        </NavLink>
       </div>
     </motion.div>
   )
