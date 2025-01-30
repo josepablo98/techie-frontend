@@ -18,6 +18,7 @@ export interface RegisterFetchProps {
   name: string;
   message?: string;
   token?: string;
+  verified?: boolean;
 }
 
 export interface LoginFetchProps {
@@ -26,6 +27,7 @@ export interface LoginFetchProps {
   name: string;
   message?: string;
   token?: string;
+  verified?: boolean;
 }
 
 export interface RequestPasswordResetValuesProps {
