@@ -4,10 +4,12 @@ import { validateRequestResetPassword } from "../validators";
 import { RequestPasswordResetValuesProps } from "../interfaces";
 import { sendResetPassword } from "../helpers";
 import { useState } from "react";
+import { CircularProgress } from "@mui/material";
+
+
 const initialState : RequestPasswordResetValuesProps = {
   email: ''
 };
-
 
 
 export const RequestPasswordResetPage = () => {
@@ -16,10 +18,9 @@ export const RequestPasswordResetPage = () => {
 
   const onSubmit = async (formValues: RequestPasswordResetValuesProps) => {
     setIsLoading(true);
-    sendResetPassword(formValues);
+    await sendResetPassword(formValues);
     setIsLoading(false);
   };
-
   return (
     <motion.div
       className="flex items-center justify-center min-h-screen bg-gray-100"
@@ -46,7 +47,11 @@ export const RequestPasswordResetPage = () => {
             className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600"
             disabled={isLoading}
           >
-            Enviar
+            {
+              isLoading
+                ? <CircularProgress size={16} color="inherit" />
+                : 'Enviar Email'
+            }
           </button>
         </form>
       </div>

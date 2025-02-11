@@ -2,10 +2,15 @@ import { NavLink } from "react-router-dom";
 import { useForm } from "../hooks"
 import { RegisterValuesProps } from "../interfaces"
 import { startRegisteringWithEmailAndPassword } from "../store/auth";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
 import { motion } from "framer-motion";
 import { validateRegister } from "../validators";
+import { useEffect, useState } from "react";
+import { status as st } from "../helpers";
+import { CircularProgress } from "@mui/material";
+import eyeOpen from "../../public/eye-open.png";
+import eyeClosed from "../../public/eye-closed.png";
 
 const initialState: RegisterValuesProps = {
   name: '',
@@ -17,11 +22,26 @@ const initialState: RegisterValuesProps = {
 export const RegisterPage = () => {
   const dispatch: AppDispatch = useDispatch();
 
+  const { status } = useSelector((state: RootState) => state.auth);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+
   const { email, name, password, errors, isSubmitted, password2, handleInputChange, handleSubmit } = useForm(initialState, validateRegister);
 
   const onSubmit = (formValues: RegisterValuesProps) => {
     dispatch(startRegisteringWithEmailAndPassword(formValues));
   }
+
+  useEffect(() => {
+    if (status === st.CHECKING) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [status])
+  
 
   return (
     <motion.div
@@ -55,33 +75,43 @@ export const RegisterPage = () => {
             />
             {isSubmitted && errors.email && <span className="text-sm text-red-500">{errors.email}</span>}
           </div>
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Contraseña"
               name="password"
               value={password}
               onChange={handleInputChange}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${isSubmitted && errors.password ? 'border-red-500' : 'focus:ring-blue-500'}`}
             />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-2">
+              <img src={showPassword ? eyeOpen : eyeClosed} alt="eye" className="w-6 h-6"/>
+            </button>
             {isSubmitted && errors.password && <span className="text-sm text-red-500">{errors.password}</span>}
           </div>
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={showPassword2 ? 'text' : 'password'}
               placeholder="Repetir contraseña"
               name="password2"
               value={password2}
               onChange={handleInputChange}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${isSubmitted && errors.password2 ? 'border-red-500' : 'focus:ring-blue-500'}`}
             />
+            <button type="button" onClick={() => setShowPassword2(!showPassword2)} className="absolute right-2 top-2">
+              <img src={showPassword2 ? eyeOpen : eyeClosed} alt="eye" className="w-6 h-6"/>
+            </button>
             {isSubmitted && errors.password2 && <span className="text-sm text-red-500">{errors.password2}</span>}
           </div>
           <button
             type="submit"
             className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600"
           >
-            Submit
+            {
+              isLoading
+                ? <CircularProgress size={16} color="inherit" />
+                : 'Registrarse'
+            }
           </button>
         </form>
         <NavLink to="/login" className="block text-center text-blue-500 hover:underline">
