@@ -13,7 +13,7 @@ export const Router = () => {
         status === st.AUTHENTICATED
           ?
           <>
-            <Route path="/home/*" element={<PrivateRouter />} />
+            <Route path="/*" element={<PrivateRouter />} />
             <Route path="*" element={<Navigate to="/home" />} />
           </>
           :

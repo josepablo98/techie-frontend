@@ -124,4 +124,11 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
       dispatch(logout({ message: 'Login falló' }));
     }
   }
-} 
+}
+
+export const startLogout = () => {
+  return async (dispatch: AppDispatch) => {
+    localStorage.removeItem('token');
+    dispatch(logout({ message: 'Sesión cerrada' }));
+  }
+}
