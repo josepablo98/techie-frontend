@@ -1,123 +1,105 @@
-import { useState, Fragment } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Menu, Transition, Dialog, DialogPanel, MenuItem, MenuItems, MenuButton } from "@headlessui/react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemButton,
+  Box
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { startLogout } from "../store/auth";
-import { AppDispatch } from "../store";
+import { AppDispatch, RootState } from "../store";
 
 export const Header = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const dispatch : AppDispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
+  const { name } = useSelector((state : RootState) => state.auth);
+  
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch(startLogout());
-  }
+    handleMenuClose();
+  };
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+    handleMenuClose();
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
-    <header className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md">
-      <div className="container mx-auto flex justify-between items-center p-4">
-        <h1 className="text-3xl font-extrabold tracking-wide">Techie</h1>
-        <nav className="flex items-center space-x-4">
-          <button className="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105">
-            Nuevo Chat
-          </button>
-          <Menu as="div" className="relative">
-            <MenuButton className="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105">
-              Opciones
-            </MenuButton>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <MenuItems className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <MenuItem>
-                  {({ active }) => (
-                    <NavLink
-                      to="/account"
-                      className={`block px-4 py-2 rounded-md ${
-                        active ? "bg-blue-500 text-white" : "text-black"
-                      }`}
-                    >
-                      Información de cuenta
-                    </NavLink>
-                  )}
-                </MenuItem>
-                <MenuItem>
-                  {({ active }) => (
-                    <NavLink
-                      to="/settings"
-                      className={`block px-4 py-2 rounded-md ${
-                        active ? "bg-blue-500 text-white" : "text-black"
-                      }`}
-                    >
-                      Configuración
-                    </NavLink>
-                  )}
-                </MenuItem>
-                <MenuItem>
-                  {({ active }) => (
-                    <button
-                      onClick={openModal}
-                      className={`block w-full text-left px-4 py-2 rounded-md ${
-                        active ? "bg-blue-500 text-white" : "text-black"
-                      }`}
-                    >
-                      Historial de chats
-                    </button>
-                  )}
-                </MenuItem>
-                <MenuItem>
-                  {({ active }) => (
-                    <button
-                      onClick={handleLogout}
-                      className={`block w-full text-left px-4 py-2 rounded-md ${
-                        active ? "bg-red-500 text-white" : "text-black"
-                      }`}
-                    >
-                    Cerrar sesión
-                    </button>
-                  )}
-                </MenuItem>
-              </MenuItems>
-            </Transition>
-          </Menu>
-        </nav>
-      </div>
+    <AppBar position="static" color="primary">
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        {/* Texto a la izquierda */}
+        <Typography variant="h6" sx={{ ml: -1 }}>{`Buenas, ${name}`}</Typography>
 
-      {/* Modal de Historial de Chats */}
-      <Dialog open={isModalOpen} onClose={closeModal} className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={closeModal} />
-        <DialogPanel className="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-6 relative transition-transform transform scale-95 opacity-100">
-          <h2 className="text-xl font-bold text-gray-800">Historial de Chats</h2>
-          <ul className="mt-4 space-y-2">
-            {["Chat 1", "Chat 2", "Chat 3", "Chat 4", "Chat 5"].map((chat, index) => (
-              <li
-                key={index}
-                className="p-3 bg-gray-100 rounded-lg hover:bg-blue-100 transition"
-              >
-                {chat}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={closeModal}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
-            >
-              Cerrar
-            </button>
-          </div>
-        </DialogPanel>
+        {/* Logo TECHIE centrado */}
+        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+          <Typography variant="h6" fontWeight="bold">
+            TECHIE
+          </Typography>
+        </Box>
+
+        {/* Botón de Nuevo Chat y Menú */}
+        <Box>
+          <Button variant="contained" color="secondary">
+            Nuevo Chat
+          </Button>
+          <IconButton color="inherit" onClick={handleMenuOpen}>
+            <MenuIcon />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+            <MenuItem component={NavLink} to="/account" onClick={handleMenuClose}>
+              Información de cuenta
+            </MenuItem>
+            <MenuItem component={NavLink} to="/settings" onClick={handleMenuClose}>
+              Configuración
+            </MenuItem>
+            <MenuItem onClick={openModal}>Historial de chats</MenuItem>
+            <MenuItem onClick={handleLogout} sx={{ color: "red" }}>
+              Cerrar sesión
+            </MenuItem>
+          </Menu>
+        </Box>
+      </Toolbar>
+
+      {/* Modal Historial de Chats */}
+      <Dialog open={isModalOpen} onClose={closeModal}>
+        <DialogTitle>Historial de Chats</DialogTitle>
+        <List>
+          {["Chat 1", "Chat 2", "Chat 3", "Chat 4", "Chat 5"].map((chat, index) => (
+            <ListItem key={index}>
+              <ListItemButton>{chat}</ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Button onClick={closeModal} variant="contained" sx={{ margin: 2 }}>
+          Cerrar
+        </Button>
       </Dialog>
-    </header>
+    </AppBar>
   );
 };

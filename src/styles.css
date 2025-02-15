@@ -1,0 +1,12 @@
+/* Eliminar margen, padding y bordes no deseados en los botones y enlaces */
+button, a {
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+  }
+  
+  /* Asegurarse de que el contenedor principal no tenga overflow */
+  body, html {
+    overflow-x: hidden;
+  }
