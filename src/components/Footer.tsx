@@ -1,6 +1,6 @@
 export const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white mt-10 py-2 shadow-lg">
+    <footer className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white mt-1 py-2 shadow-lg">
       <div className="w-full flex justify-center px-4">
         {/* Enlaces */}
         <nav className="flex space-x-6">
