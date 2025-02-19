@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppBar,
@@ -26,6 +26,7 @@ export const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const { name } = useSelector((state : RootState) => state.auth);
+  const navigate = useNavigate();
   
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -52,7 +53,8 @@ export const Header = () => {
   };
 
   const handleNewChat = () => {
-    window.location.href = "/chat";
+    navigate("/chat");
+    window.location.reload();
   };
 
   return (
