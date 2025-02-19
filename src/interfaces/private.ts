@@ -24,3 +24,14 @@ export interface UpdateChatProps {
     email: string;
     message: string;
 }
+
+export interface GeminiRequestProps {
+    text: string;
+    context?: ChatFormProps[];
+}
+
+export interface UpdateTitleProps {
+    title: string;
+    email: string;
+    chatId: number;
+}

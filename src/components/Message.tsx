@@ -1,26 +1,25 @@
-import { MessageComponentProps } from "../interfaces"
-import { Box, Typography } from "@mui/material";
+import { MessageComponentProps } from "../interfaces";
 
-export const Message = ({ text, isBotResponse } : MessageComponentProps) => {
+export const Message = ({ text, isBotResponse }: MessageComponentProps) => {
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: isBotResponse ? 'flex-start' : 'flex-end',
-                mb: 2
+        <div
+            style={{
+                display: "flex",
+                justifyContent: isBotResponse ? "flex-start" : "flex-end",
+                margin: "10px 0",
             }}
         >
-            <Box
-                sx={{
-                    maxWidth: '60%',
-                    p: 2,
-                    borderRadius: 2,
-                    bgcolor: isBotResponse ? 'grey.300' : 'primary.main',
-                    color: isBotResponse ? 'black' : 'white',
+            <div
+                style={{
+                    backgroundColor: isBotResponse ? "#f1f0f0" : "#007bff",
+                    color: isBotResponse ? "#000" : "#fff",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    maxWidth: "60%",
                 }}
             >
-                <Typography variant="body1">{text}</Typography>
-            </Box>
-        </Box>
+                {text}
+            </div>
+        </div>
     );
-}
+};

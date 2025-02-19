@@ -5,7 +5,7 @@ import { ChatBoxProps, ChatFormProps } from "../interfaces";
 import { useEffect, useState, useRef } from "react";
 import { Message } from "./Message";
 import { validateChat } from "../validators";
-import { saveNewChat, updateChat } from "../helpers"
+import { fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 
@@ -14,29 +14,37 @@ const initialState: ChatFormProps = {
     index: -1,
 };
 
-export const ChatBox = ({ context }: ChatBoxProps) => {
+export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     const { email } = useSelector((state: RootState) => state.auth);
     const [messages, setMessages] = useState<ChatFormProps[]>(context || []);
-    const messagesEndRef = useRef<HTMLDivElement | null>(null); // 🔹 Referencia para el último mensaje
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
     const { formState, errors, handleInputChange, handleSubmit } = useForm(
         initialState,
         validateChat
     );
 
     useEffect(() => {
-        if (context) {
+        if (context.length > 0) {
             setMessages(context);
-            formState.index = context[context.length - 1].index; // Actualiza formState.index
+            formState.index = context[context.length - 1].index;
         }
-    }, [context]);
+    }, []);
 
     useEffect(() => {
-        // 🔹 Hace scroll al final cuando hay nuevos mensajes
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
     const onSubmit = async () => {
-        const newMessage = { message: formState.message, index: formState.index + 1 };
+        setIsLoading(true);
+
+        // Mensaje del usuario
+        const newMessage = { message: formState.message, index: messages.length };
+        setMessages([...messages, newMessage]);
+
+        formState.message = "";
+
         if (newMessage.index === 0 && email) {
             const data = await saveNewChat({ email, message: newMessage.message });
             if (data && data.chatId) {
@@ -44,11 +52,36 @@ export const ChatBox = ({ context }: ChatBoxProps) => {
             }
         } else if (email) {
             await updateChat({ chatId: Number(window.location.pathname.split("/")[2]), email, message: newMessage.message });
-        } 
-        setMessages([...messages, newMessage]);
-        formState.message = "";
-        formState.index = newMessage.index;
+        }
+        context = [...messages, newMessage];
+        let response;
+        if (newMessage.index === 0) {
+            response = await fetchGeminiApi({ text: newMessage.message });
+        } else {
+            response = await fetchGeminiApi({ text: newMessage.message, context });
+        }
+        const chatTitle = response.response.split("//")[0].trim();
+        const chatMessage = response.response.split("//").slice(1).join(" ").trim();
+        context = [...messages, { message: chatMessage, index: messages.length + 1 }];
+
+        // Si es el primer mensaje, actualizar el título del chat
+        if (newMessage.index === 0 && email) {
+            await updateTitle({ chatId: Number(window.location.pathname.split("/")[2]), email, title: chatTitle });
+        }
+
+        if (email) {
+            await updateChat({ chatId: Number(window.location.pathname.split("/")[2]), email, message: chatMessage });
+        }
+
+        // Mensaje de la IA
+        setMessages((prevMessages) => [
+            ...prevMessages,
+            { message: chatMessage, index: messages.length + 1 }, // La IA responde con el siguiente índice
+        ]);
+
+        setIsLoading(false);
     };
+
 
     return (
         <Box
@@ -60,7 +93,6 @@ export const ChatBox = ({ context }: ChatBoxProps) => {
                 overflow: "hidden",
             }}
         >
-            {/* Contenedor de mensajes con scroll interno */}
             <Box
                 sx={{
                     flex: 1,
@@ -73,14 +105,12 @@ export const ChatBox = ({ context }: ChatBoxProps) => {
                     <Message
                         key={index}
                         text={message.message}
-                        isBotResponse={message.index % 2 !== 0}
+                        isBotResponse={index % 2 !== 0}
                     />
                 ))}
-                {/* 🔹 Div invisible que hará scroll al final */}
                 <div ref={messagesEndRef} />
             </Box>
 
-            {/* Input del chat */}
             <Paper
                 component="form"
                 onSubmit={(e) => handleSubmit(e, onSubmit)}
@@ -109,8 +139,9 @@ export const ChatBox = ({ context }: ChatBoxProps) => {
                             height: "40px",
                         },
                     }}
+                    disabled={isLoading}
                 />
-                <IconButton type="submit" color="primary" sx={{ width: "40px", height: "40px" }}>
+                <IconButton type="submit" color="primary" sx={{ width: "40px", height: "40px" }} disabled={isLoading}>
                     <SendIcon fontSize="small" />
                 </IconButton>
             </Paper>
