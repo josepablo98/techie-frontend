@@ -20,6 +20,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { startLogout } from "../store/auth";
 import { AppDispatch, RootState } from "../store";
 
+
 export const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +51,10 @@ export const Header = () => {
     setIsModalOpen(false);
   };
 
+  const handleNewChat = () => {
+    window.location.href = "/chat";
+  };
+
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -65,7 +70,7 @@ export const Header = () => {
 
         {/* Botón de Nuevo Chat y Menú */}
         <Box>
-          <Button variant="contained" color="secondary">
+          <Button variant="contained" color="secondary" onClick={handleNewChat}>
             Nuevo Chat
           </Button>
           <IconButton color="inherit" onClick={handleMenuOpen}>

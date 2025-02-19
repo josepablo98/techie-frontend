@@ -4,7 +4,6 @@ import { useForm } from "../hooks";
 import { ChatBoxProps, ChatFormProps } from "../interfaces";
 import { useEffect, useState, useRef } from "react";
 import { Message } from "./Message";
-import { validateChat } from "../validators";
 import { fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -20,14 +19,12 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    const { formState, errors, handleInputChange, handleSubmit } = useForm(
+    const { formState, handleInputChange, handleSubmit } = useForm(
         initialState,
-        validateChat
     );
 
     useEffect(() => {
         if (context.length > 0) {
-            setMessages(context);
             formState.index = context[context.length - 1].index;
         }
     }, []);
@@ -37,6 +34,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     }, [messages]);
 
     const onSubmit = async () => {
+        if (formState.message === "") return;
         setIsLoading(true);
 
         // Mensaje del usuario
@@ -131,8 +129,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
                     placeholder="Escribe un mensaje..."
                     value={formState.message}
                     onChange={handleInputChange}
-                    error={!!errors.message}
-                    helperText={errors.message}
                     sx={{
                         marginRight: "8px",
                         "& .MuiInputBase-root": {
