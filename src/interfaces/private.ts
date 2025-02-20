@@ -15,13 +15,13 @@ export interface MessageComponentProps {
 }
 
 export interface SaveNewChatProps {
-    email: string;
+    token: string;
     message: string;
 }
 
 export interface UpdateChatProps {
     chatId: number;
-    email: string;
+    token: string;
     message: string;
 }
 
@@ -32,16 +32,16 @@ export interface GeminiRequestProps {
 
 export interface UpdateTitleProps {
     title: string;
-    email: string;
+    token: string;
     chatId: number;
 }
 
 export interface GetChatsProps {
-    email: string;
+    token: string;
 }
 
 export interface GetChatProps {
-    email: string;
+    token: string;
     chatId: number;
 }
 

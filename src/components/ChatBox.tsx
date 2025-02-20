@@ -4,8 +4,8 @@ import { useForm } from "../hooks";
 import { ChatBoxProps, ChatFormProps } from "../interfaces";
 import { useEffect, useState, useRef } from "react";
 import { Message } from "./Message";
-import { fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
-import { useSelector } from "react-redux";
+import { checkToken, fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
 
 const initialState: ChatFormProps = {
@@ -19,29 +19,27 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { formState, handleInputChange, handleSubmit } = useForm(initialState);
+  const dispatch = useDispatch();
 
   // Solo al cargar, si aún no hay mensajes, inicializamos desde context.
   useEffect(() => {
-  console.log("ChatBox useEffect: context =", context, "messages length =", messages.length);
 
   // Si context cambia y tiene mensajes nuevos, actualizamos messages
   if (context.length > 0) {
-    console.log("ChatBox: Actualizando mensajes con context");
     setMessages(context);
     formState.index = context[context.length - 1].index;
-    console.log("ChatBox: formState.index =", formState.index);
   }
 }, [context]); // ← Ahora depende de `context`, se ejecutará siempre que cambie
 
 
   useEffect(() => {
-    console.log("ChatBox: messages actualizados =", messages);
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const onSubmit = async () => {
+    checkToken(dispatch);
+
     if (formState.message === "") return;
-    console.log("ChatBox onSubmit: mensaje enviado =", formState.message);
     setIsLoading(true);
 
     // Crear el mensaje del usuario
@@ -50,20 +48,18 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       index: messages.length,
     };
     const newMessages = [...messages, newMessage];
-    console.log("ChatBox onSubmit: newMessages =", newMessages);
     setMessages(newMessages);
     formState.message = "";
-
-    if (newMessage.index === 0 && email) {
-      const data = await saveNewChat({ email, message: newMessage.message });
-      console.log("ChatBox: saveNewChat devuelve =", data);
+    const token = localStorage.getItem("token");
+    if (newMessage.index === 0 && email && token) {
+      const data = await saveNewChat({ token, message: newMessage.message });
       if (data && data.chatId) {
         window.history.pushState(null, "", `/chat/${data.chatId}`);
       }
-    } else if (email) {
+    } else if (email && token) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
-        email,
+        token,
         message: newMessage.message,
       });
     }
@@ -74,7 +70,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     } else {
       response = await fetchGeminiApi({ text: newMessage.message, context: newMessages });
     }
-    console.log("ChatBox: fetchGeminiApi response =", response);
     const chatTitle = response.response.split("//")[0].trim();
     const chatMessage = response.response.split("//").slice(1).join(" ").trim();
     const aiMessage: ChatFormProps = {
@@ -82,23 +77,22 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       index: newMessages.length,
     };
 
-    if (newMessage.index === 0 && email) {
+    if (newMessage.index === 0 && email && token) {
       await updateTitle({
         chatId: Number(window.location.pathname.split("/")[2]),
-        email,
+        token,
         title: chatTitle,
       });
     }
-    if (email) {
+    if (email && token) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
-        email,
+        token,
         message: chatMessage,
       });
     }
 
     const finalMessages = [...newMessages, aiMessage];
-    console.log("ChatBox: finalMessages =", finalMessages);
     setMessages(finalMessages);
     setIsLoading(false);
   };

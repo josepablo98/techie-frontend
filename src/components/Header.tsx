@@ -15,6 +15,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { startLogout } from "../store/auth";
 import { AppDispatch, RootState } from "../store";
 import { ChatHistoryModal } from "./ChatHistoryModal";
+import { checkToken } from "../helpers";
 
 export const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -38,6 +39,7 @@ export const Header = () => {
   };
 
   const openModal = () => {
+    checkToken(dispatch);
     setIsModalOpen(true);
     handleMenuClose();
   };
@@ -47,6 +49,7 @@ export const Header = () => {
   };
 
   const handleNewChat = () => {
+    checkToken(dispatch);
     navigate("/chat");
     window.location.reload();
   };

@@ -1,13 +1,13 @@
 import { GeminiRequestProps, GetChatProps, GetChatsProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
 
-export const saveNewChat = async ({ email, message }: SaveNewChatProps) => {
+export const saveNewChat = async ({ token, message }: SaveNewChatProps) => {
     try {
         const resp = await fetch("http://localhost:8080/chat/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, message }),
+            body: JSON.stringify({ token, message }),
         });
         const data = await resp.json();
         return data;
@@ -16,14 +16,14 @@ export const saveNewChat = async ({ email, message }: SaveNewChatProps) => {
     }
 };
 
-export const updateChat = async ({ chatId, email, message }: UpdateChatProps) => {
+export const updateChat = async ({ chatId, token, message }: UpdateChatProps) => {
     try {
         const resp = await fetch(`http://localhost:8080/chat/update/${chatId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, message }),
+            body: JSON.stringify({ token, message }),
         });
         await resp.json();
     } catch (error) {
@@ -31,15 +31,14 @@ export const updateChat = async ({ chatId, email, message }: UpdateChatProps) =>
     }
 };
 
-export const updateTitle = async ({ chatId, email, title }: UpdateTitleProps) => {
+export const updateTitle = async ({ chatId, token, title }: UpdateTitleProps) => {
     try {
-        console.table({ chatId, email, title });
         const resp = await fetch(`http://localhost:8080/chat/update-title/${chatId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, title }),
+            body: JSON.stringify({ token, title }),
         });
         await resp.json();
     } catch (error) {
@@ -63,14 +62,14 @@ export const fetchGeminiApi = async ({ text, context }: GeminiRequestProps) => {
     }
 };
 
-export const getChatsByUserId = async ({ email }: GetChatsProps) => {
+export const getChatsByUserId = async ({ token }: GetChatsProps) => {
     try {
         const resp = await fetch("http://localhost:8080/chat/getchats", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ token }),
         })
         const data = await resp.json();
         return data.chats;
@@ -79,14 +78,14 @@ export const getChatsByUserId = async ({ email }: GetChatsProps) => {
     }
 };
 
-export const getChatByUserIdAndChatId = async ({ email, chatId }: GetChatProps) => {
+export const getChatByUserIdAndChatId = async ({ token, chatId }: GetChatProps) => {
     try {
         const resp = await fetch(`http://localhost:8080/chat/getchat/${chatId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ token }),
         })
         const data = await resp.json();
         return data.chat;
