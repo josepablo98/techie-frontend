@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ChatBox } from "../components";
 import { Layout } from "../layout/Layout";
-import { getChatByUserIdAndChatId } from "../helpers";
+import { checkToken, getChatByUserIdAndChatId } from "../helpers";
 import { ChatFormProps } from "../interfaces";
+import { useDispatch } from "react-redux";
 
 export const ChatPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [context, setContext] = useState<ChatFormProps[]>([]);
+  const dispatch = useDispatch();
 
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    checkToken(dispatch);
+  }, [])
 
   useEffect(() => {
     if (chatId && token) {
