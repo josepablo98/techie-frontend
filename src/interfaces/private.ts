@@ -35,3 +35,22 @@ export interface UpdateTitleProps {
     email: string;
     chatId: number;
 }
+
+export interface GetChatsProps {
+    email: string;
+}
+
+export interface GetChatProps {
+    email: string;
+    chatId: number;
+}
+
+export interface ChatHistoryModalProps {
+    open: boolean;
+    onClose: () => void;
+}
+
+export interface Chat {
+    id: number;
+    title: string;
+}

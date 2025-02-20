@@ -5,6 +5,7 @@ import { RequestPasswordResetValuesProps } from "../interfaces";
 import { sendResetPassword } from "../helpers";
 import { useState } from "react";
 import { CircularProgress } from "@mui/material";
+import { NavLink } from "react-router-dom";
 
 
 const initialState : RequestPasswordResetValuesProps = {
@@ -54,6 +55,9 @@ export const RequestPasswordResetPage = () => {
             }
           </button>
         </form>
+        <NavLink to="/login" className="block text-center text-blue-500 hover:underline">
+            Atras
+        </NavLink>
       </div>
     </motion.div>
   );

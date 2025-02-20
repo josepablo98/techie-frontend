@@ -1,4 +1,4 @@
-import { GeminiRequestProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
+import { GeminiRequestProps, GetChatProps, GetChatsProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
 
 export const saveNewChat = async ({ email, message }: SaveNewChatProps) => {
     try {
@@ -62,3 +62,35 @@ export const fetchGeminiApi = async ({ text, context }: GeminiRequestProps) => {
         console.error("Error fetching chat", error);
     }
 };
+
+export const getChatsByUserId = async ({ email }: GetChatsProps) => {
+    try {
+        const resp = await fetch("http://localhost:8080/chat/getchats", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        })
+        const data = await resp.json();
+        return data.chats;
+    } catch (error) {
+        console.error("Error getting chats", error);
+    }
+};
+
+export const getChatByUserIdAndChatId = async ({ email, chatId }: GetChatProps) => {
+    try {
+        const resp = await fetch(`http://localhost:8080/chat/getchat/${chatId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        })
+        const data = await resp.json();
+        return data.chat;
+    } catch (error) {
+        console.error("Error getting chat", error);
+    }
+}

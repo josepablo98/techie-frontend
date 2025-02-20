@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { verify } from "../helpers";
 
 export const VerifiedEmailPage = () => {
   const [message, setMessage] = useState("");
@@ -13,15 +14,7 @@ export const VerifiedEmailPage = () => {
 
     const verifyEmail = async () => {
       try {
-        const response = await fetch("http://localhost:8080/auth/verify-email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        });
-
-        const data = await response.json();
+        const data = await verify(token!);
         if (data.ok) {
           setIsSuccess(true);
           setMessage("Cuenta verificada correctamente");
