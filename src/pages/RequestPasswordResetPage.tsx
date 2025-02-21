@@ -35,7 +35,7 @@ export const RequestPasswordResetPage = () => {
           <div>
             <input
               type="text"
-              placeholder="Introducte tu email"
+              placeholder="Introduce tu email"
               name="email"
               value={email}
               onChange={handleInputChange}

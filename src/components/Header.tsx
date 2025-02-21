@@ -84,7 +84,7 @@ export const Header = () => {
   };
 
   const handleNewChat = () => {
-    navigate("/newchat");
+    navigate("/newchat", { replace: true });
     checkToken(dispatch);
   };
 

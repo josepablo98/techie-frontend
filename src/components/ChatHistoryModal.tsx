@@ -11,7 +11,7 @@ export const ChatHistoryModal = ({ open, onClose, chats }: ChatHistoryModalProps
   const handleChatClick = (chatId: number) => {
     onClose();
     checkToken(dispatch);
-    navigate(`/chat/${chatId}`);
+    navigate(`/chat/${chatId}`, { replace: true });
   };
 
   return (
