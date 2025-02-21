@@ -9,7 +9,7 @@ import './styles.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <App />
         <ToastContainer />
       </BrowserRouter>

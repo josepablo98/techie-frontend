@@ -39,6 +39,8 @@ export const Header = () => {
       getChatByUserIdAndChatId({ token, chatId: Number(chatId) })
         .then((chat) => setTit(chat[0].title))
         .catch((error) => console.error(error))
+    } else {
+      setTit("TECHIE");
     }
   }, [chatId])
   

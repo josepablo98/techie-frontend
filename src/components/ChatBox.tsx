@@ -20,14 +20,16 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { formState, handleInputChange, handleSubmit } = useForm(initialState);
   const dispatch = useDispatch();
-
   // Solo al cargar, si aún no hay mensajes, inicializamos desde context.
   useEffect(() => {
-
+  console.log("context", context);
   // Si context cambia y tiene mensajes nuevos, actualizamos messages
   if (context.length > 0) {
     setMessages(context);
     formState.index = context[context.length - 1].index;
+  } else {
+    setMessages([]);
+    formState.index = -1;
   }
 }, [context]); // ← Ahora depende de `context`, se ejecutará siempre que cambie
 

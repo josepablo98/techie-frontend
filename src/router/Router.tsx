@@ -4,12 +4,13 @@ import { PublicRouter } from "./PublicRouter";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { status as st } from "../helpers";
+import { LoadingPage } from "../pages/LoadingPage";
 
 export const Router = () => {
   const { status } = useSelector((state: RootState) => state.auth);
 
   if (status === st.CHECKING) {
-    return <div>Loading...</div>
+    return <LoadingPage />;
   }
   return (
     <Routes>

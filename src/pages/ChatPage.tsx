@@ -11,17 +11,18 @@ export const ChatPage = () => {
   const [context, setContext] = useState<ChatFormProps[]>([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   useEffect(() => {
     checkToken(dispatch);
-  }, [])
-  
+  }, [dispatch]);
+
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
-    if (chatId && token) {
-      getChatByUserIdAndChatId({ token, chatId: Number(chatId) })
-        .then((chat) => {
+    const fetchChat = async () => {
+      if (chatId && token) {
+        try {
+          const chat = await getChatByUserIdAndChatId({ token, chatId: Number(chatId) });
           if (chat && chat[0] && chat[0].messages) {
             let messages = chat[0].messages;
             if (typeof messages === "string") {
@@ -33,15 +34,22 @@ export const ChatPage = () => {
             }
             setContext(messages);
           } else {
-            navigate("/chat");
+            setContext([]);
+            navigate("/chat", { replace: true });
           }
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error("Error getting chat", error);
-          navigate("/chat");
-        });
-    }
-  }, [chatId, token, navigate]);
+          setContext([]);
+          navigate("/chat", { replace: true });
+        }
+      } else {
+        setContext([]);
+        navigate("/chat", { replace: true });
+      }
+    };
+
+    fetchChat();
+  }, [chatId, token]);
 
   return (
     <Layout>
