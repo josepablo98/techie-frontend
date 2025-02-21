@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ChatBox } from "../components";
 import { Layout } from "../layout/Layout";
 import { checkToken, getChatByUserIdAndChatId } from "../helpers";
@@ -10,12 +10,13 @@ export const ChatPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [context, setContext] = useState<ChatFormProps[]>([]);
   const dispatch = useDispatch();
-
-  const token = localStorage.getItem("token");
-
+  const navigate = useNavigate();
   useEffect(() => {
     checkToken(dispatch);
   }, [])
+  
+  const token = localStorage.getItem("token");
+
 
   useEffect(() => {
     if (chatId && token) {
@@ -31,11 +32,16 @@ export const ChatPage = () => {
               }
             }
             setContext(messages);
+          } else {
+            navigate("/chat");
           }
         })
-        .catch((error) => console.error("Error cargando chat:", error));
+        .catch((error) => {
+          console.error("Error getting chat", error);
+          navigate("/chat");
+        });
     }
-  }, [chatId, token]);
+  }, [chatId, token, navigate]);
 
   return (
     <Layout>

@@ -6,6 +6,7 @@ export const PrivateRouter = () => {
     <Routes>
       <Route path="/chat/:chatId" element={<ChatPage />} />
       <Route path="/chat" element={<ChatPage />} />
+      <Route path="/newchat" element={<Navigate to="/chat" />} />
       <Route path="/*" element={<Navigate to="/chat" />} />
     </Routes>
   );

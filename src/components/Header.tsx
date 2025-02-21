@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppBar,
@@ -15,14 +15,33 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { startLogout } from "../store/auth";
 import { AppDispatch, RootState } from "../store";
 import { ChatHistoryModal } from "./ChatHistoryModal";
-import { checkToken } from "../helpers";
+import { checkToken, getChatByUserIdAndChatId, getChatsByUserId } from "../helpers";
+import { toast } from "react-toastify";
+import { Chat } from "../interfaces";
 
 export const Header = () => {
+
+  
+  const { chatId } = useParams<{ chatId: string }>();
+
+  const token = localStorage.getItem("token");
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tit, setTit] = useState("TECHIE");
+  const [chats, setChats] = useState<Chat[]>([]);
   const dispatch: AppDispatch = useDispatch();
   const { name } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (chatId && token) {
+      getChatByUserIdAndChatId({ token, chatId: Number(chatId) })
+        .then((chat) => setTit(chat[0].title))
+        .catch((error) => console.error(error))
+    }
+  }, [chatId])
+  
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -38,9 +57,23 @@ export const Header = () => {
     handleMenuClose();
   };
 
-  const openModal = () => {
+  const openModal = async () => {
     checkToken(dispatch);
-    setIsModalOpen(true);
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const chats = await getChatsByUserId({ token });
+        if (chats && chats.length > 0) {
+          setChats(chats);
+          setIsModalOpen(true);
+        } else {
+          toast.info("No hay chats disponibles");
+        }
+      } catch (error) {
+        console.error("Error cargando chats:", error);
+        toast.error("Error cargando chats");
+      }
+    }
     handleMenuClose();
   };
 
@@ -49,9 +82,8 @@ export const Header = () => {
   };
 
   const handleNewChat = () => {
+    navigate("/newchat");
     checkToken(dispatch);
-    navigate("/chat");
-    window.location.reload();
   };
 
   return (
@@ -66,7 +98,7 @@ export const Header = () => {
           {/* Logo TECHIE centrado */}
           <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
             <Typography variant="h6" fontWeight="bold">
-              TECHIE
+              {tit}
             </Typography>
           </Box>
 
@@ -93,7 +125,7 @@ export const Header = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <ChatHistoryModal open={isModalOpen} onClose={closeModal} />
+      <ChatHistoryModal open={isModalOpen} onClose={closeModal} chats={chats} />
     </>
   );
 };

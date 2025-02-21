@@ -45,9 +45,15 @@ export interface GetChatProps {
     chatId: number;
 }
 
+export interface DeleteChatProps {
+    token: string;
+    chatId: number;
+}
+
 export interface ChatHistoryModalProps {
     open: boolean;
     onClose: () => void;
+    chats: Chat[];
 }
 
 export interface Chat {

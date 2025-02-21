@@ -1,4 +1,4 @@
-import { GeminiRequestProps, GetChatProps, GetChatsProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
+import { DeleteChatProps, GeminiRequestProps, GetChatProps, GetChatsProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
 
 export const saveNewChat = async ({ token, message }: SaveNewChatProps) => {
     try {
@@ -48,7 +48,7 @@ export const updateTitle = async ({ chatId, token, title }: UpdateTitleProps) =>
 
 export const fetchGeminiApi = async ({ text, context }: GeminiRequestProps) => {
     try {
-        const resp = await fetch("http://localhost:8080/chat/fetch", {
+        const resp = await fetch("http://localhost:5000/chat/fetch", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -91,5 +91,21 @@ export const getChatByUserIdAndChatId = async ({ token, chatId }: GetChatProps) 
         return data.chat;
     } catch (error) {
         console.error("Error getting chat", error);
+    }
+}
+
+export const deleteChat = async ({ token, chatId }: DeleteChatProps) => {
+    try {
+        const resp = await fetch(`http://localhost:8080/chat/delete/${chatId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+        });
+        const data = await resp.json();
+        return data;
+    } catch (error) {
+        console.error("Error deleting chat", error);
     }
 }
