@@ -1,9 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom"
-import { RegisterPage } from "../pages/RegisterPage"
-import { LoginPage } from "../pages/LoginPage"
-import { RequestPasswordResetPage } from "../pages/RequestPasswordResetPage"
-import { ResetPasswordPage } from "../pages/ResetPasswordPage"
-import { VerifiedEmailPage } from "../pages/VerifiedEmailPage"
+import { LoginPage, RegisterPage, RequestPasswordResetPage, ResetPasswordPage, VerifiedEmailPage } from "../pages"
 
 export const PublicRouter = () => {
   return (
