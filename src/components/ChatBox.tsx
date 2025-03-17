@@ -1,15 +1,14 @@
+// ChatBox.tsx
+
 import { useForm } from "../hooks";
 import { ChatBoxProps, ChatFormProps } from "../interfaces";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { Message } from "./Message";
 import { checkToken, fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
+import { ThemeContext } from "../context/ThemeContext";
 
-/**
- * Ejemplo de un icono "Send" con un simple SVG. 
- * Si prefieres usar Heroicons, instala y usa la librería correspondiente.
- */
 const SendIcon = () => (
   <svg
     className="w-4 h-4"
@@ -39,8 +38,10 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const { formState, handleInputChange, handleSubmit } = useForm(initialState);
   const dispatch = useDispatch();
 
+  // Obtenemos el tema desde el contexto
+  const { theme } = useContext(ThemeContext);
+
   useEffect(() => {
-    // Si context cambia y tiene mensajes nuevos, actualizamos messages
     if (context.length > 0) {
       setMessages(context);
       formState.index = context[context.length - 1].index;
@@ -60,8 +61,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     if (formState.message === "") return;
 
     setIsLoading(true);
-
-    // Crear el mensaje del usuario
     const newMessage: ChatFormProps = {
       message: formState.message,
       index: messages.length,
@@ -71,7 +70,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     formState.message = "";
 
     const token = localStorage.getItem("token");
-    // Guardar o actualizar el chat en BD (lógica original)
     if (newMessage.index === 0 && email && token) {
       const data = await saveNewChat({ token, message: newMessage.message });
       if (data && data.chatId) {
@@ -85,7 +83,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       });
     }
 
-    // Llamar a la API
     let response;
     if (newMessage.index === 0) {
       response = await fetchGeminiApi({ text: newMessage.message });
@@ -99,7 +96,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       index: newMessages.length,
     };
 
-    // Actualizar título del chat (si es el primer mensaje)
     if (newMessage.index === 0 && email && token) {
       await updateTitle({
         chatId: Number(window.location.pathname.split("/")[2]),
@@ -107,7 +103,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
         title: chatTitle,
       });
     }
-    // Guardar respuesta de la IA en BD
     if (email && token) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
@@ -121,8 +116,24 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     setIsLoading(false);
   };
 
+  // Contenedor principal (opcional, si quieres un color distinto que el global)
+  const containerClasses =
+    theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-white text-black";
+
+  // Barra inferior donde va el input
+  const barClasses =
+    theme === "dark"
+      ? "bg-gray-800"  // FONDO OSCURO
+      : "bg-gray-100"; // FONDO CLARO (o blanco si prefieres)
+
+  // Clases para el input en modo oscuro
+  const inputClasses =
+    theme === "dark"
+      ? "bg-gray-700 text-gray-100 placeholder-gray-400"
+      : "bg-white text-black placeholder-gray-500";
+
   return (
-    <div className="flex flex-col h-full max-h-screen overflow-hidden">
+    <div className={`flex flex-col h-full max-h-screen overflow-hidden ${containerClasses}`}>
       {/* Contenedor de mensajes */}
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
         {messages.map((message, index) => (
@@ -134,16 +145,15 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       {/* Barra de envío */}
       <form
         onSubmit={(e) => handleSubmit(e, onSubmit)}
-        className="flex items-center p-2 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] bg-white h-14"
+        className={`flex items-center p-2 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] h-14 ${barClasses}`}
       >
         <input
           type="text"
           name="message"
           placeholder="Escribe un mensaje..."
-          className="flex-1 mr-2 h-10 border border-gray-300 rounded px-2 disabled:bg-gray-100"
+          className={`flex-1 mr-2 h-10 border border-gray-300 rounded px-2 disabled:bg-gray-100 ${inputClasses}`}
           value={formState.message}
           onChange={handleInputChange}
-          disabled={isLoading}
         />
         <button
           type="submit"

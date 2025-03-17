@@ -40,6 +40,7 @@ export interface GetChatsProps {
     token: string;
 }
 
+
 export interface GetChatProps {
     token: string;
     chatId: number;
@@ -59,4 +60,35 @@ export interface ChatHistoryModalProps {
 export interface Chat {
     id: number;
     title: string;
+}
+
+export interface GetSettingsProps {
+    token: string;
+}
+
+export interface UpdateSettingsProps {
+    token: string;
+    theme?: string;
+    language?: string;
+    detailLevel?: string;
+    autoSaveChats?: number;
+}
+
+export interface SettingsFormProps {
+    theme: string;
+    language: string;
+    detailLevel: string;
+    tempChats: boolean;
+}
+
+export interface SettingsForm {
+    theme: string;
+    language: string;
+    detailLevel: string;
+    tempChats: boolean;
+}
+
+export interface ThemeContextType {
+    theme: "light" | "dark";
+    setTheme: React.Dispatch<React.SetStateAction<"light" | "dark">>;
 }

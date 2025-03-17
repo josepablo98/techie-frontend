@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+// components/Header.tsx
+import { useContext, useEffect, useState } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { startLogout } from "../store/auth";
@@ -9,21 +11,15 @@ import { toast } from "react-toastify";
 import { Chat } from "../interfaces";
 
 const MenuIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    viewBox="0 0 24 24"
-  >
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
   </svg>
 );
 
 export const Header = () => {
+  const { theme } = useContext(ThemeContext);
   const { chatId } = useParams<{ chatId: string }>();
   const token = localStorage.getItem("token");
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tit, setTit] = useState("TECHIE");
@@ -36,15 +32,13 @@ export const Header = () => {
     if (chatId && token) {
       getChatByUserIdAndChatId({ token, chatId: Number(chatId) })
         .then((chat) => setTit(chat[0].title))
-        .catch((error) => console.error(error));
+        .catch(console.error);
     } else {
       setTit("TECHIE");
     }
   }, [chatId, token]);
 
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -71,9 +65,7 @@ export const Header = () => {
     setIsMenuOpen(false);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const closeModal = () => setIsModalOpen(false);
 
   const handleNewChat = () => {
     navigate("/newchat", { replace: true });
@@ -81,23 +73,27 @@ export const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // Clases condicionales para el header
+  const headerClasses =
+    theme === "dark"
+      ? "bg-gray-800 text-gray-100"
+      : "bg-blue-600 text-white";
+
+  const dropdownClasses =
+    theme === "dark"
+      ? "bg-gray-700 text-gray-100"
+      : "bg-blue-500 text-white";
+
   return (
     <>
-      {/* Header ocupando todo el ancho */}
-      <header className="bg-blue-600 text-white w-full">
-        {/* Usamos grid de 3 columnas para colocar Izquierda, Centro y Derecha */}
+      <header className={`${headerClasses} w-full`}>
         <div className="grid grid-cols-3 items-center px-4 py-2">
-          {/* Columna Izquierda: Saludo */}
           <div>
             <span className="text-xl font-semibold">{`Buenas, ${name}`}</span>
           </div>
-
-          {/* Columna Centro: Título (centrado) */}
           <div className="flex justify-center">
             <h1 className="text-2xl font-bold">{tit}</h1>
           </div>
-
-          {/* Columna Derecha: Botones alineados a la derecha */}
           <div className="flex justify-end items-center space-x-2">
             <button
               className="bg-yellow-400 text-black px-3 py-1 rounded hover:bg-yellow-300"
@@ -110,11 +106,8 @@ export const Header = () => {
             </button>
           </div>
         </div>
-
-        {/* Menú desplegable (Dropdown) */}
         {isMenuOpen && (
-          <div className="bg-blue-500 text-white py-2">
-            {/* Sin contenedor max-w-screen ni mx-auto, para usar todo el ancho */}
+          <div className={`${dropdownClasses} py-2`}>
             <ul className="flex flex-col items-start px-4 space-y-2">
               <li>
                 <NavLink
@@ -149,7 +142,6 @@ export const Header = () => {
         )}
       </header>
 
-      {/* Modal de historial de chats */}
       <ChatHistoryModal open={isModalOpen} onClose={closeModal} chats={chats} />
     </>
   );
