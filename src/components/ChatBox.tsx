@@ -151,6 +151,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
           type="text"
           name="message"
           placeholder="Escribe un mensaje..."
+          autoComplete="off"
           className={`flex-1 mr-2 h-10 border border-gray-300 rounded px-2 disabled:bg-gray-100 ${inputClasses}`}
           value={formState.message}
           onChange={handleInputChange}
