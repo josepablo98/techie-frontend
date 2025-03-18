@@ -1,6 +1,5 @@
 // components/Header.tsx
-import { useContext, useEffect, useState } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { startLogout } from "../store/auth";
@@ -17,7 +16,7 @@ const MenuIcon = () => (
 );
 
 export const Header = () => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useSelector((state: RootState) => state.settings);
   const { chatId } = useParams<{ chatId: string }>();
   const token = localStorage.getItem("token");
   const [isMenuOpen, setIsMenuOpen] = useState(false);

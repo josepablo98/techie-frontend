@@ -1,125 +1,114 @@
-import { useState, useEffect, ChangeEvent, FormEvent, useRef, useContext } from "react";
-import { NavLink } from "react-router-dom";
-import { getChatsByUserId, deleteChat, checkToken, getSettings, updateSettings } from "../helpers";
-import { useDispatch } from "react-redux";
+// pages/SettingsPage.tsx
+import { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../store";
+import { getChatsByUserId, deleteChat, checkToken } from "../helpers";
+import { updateSettingsThunk } from "../store/settings/thunks";
 import { Chat } from "../interfaces";
+import { NavLink } from "react-router-dom";
 import { LoadingPage } from "./LoadingPage";
-import { ThemeContext } from "../context/ThemeContext";
-
-// Interfaz para nuestros settings
-interface SettingsForm {
-  theme: string;
-  language: string;
-  detailLevel: string;
-  tempChats: boolean;
-}
 
 export const SettingsPage = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [chats, setChats] = useState<Chat[]>([]);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
-  const [formState, setFormState] = useState<SettingsForm | null>(null);
-  const [oldSettings, setOldSettings] = useState<SettingsForm | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const initialLoaded = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Obtenemos el tema desde el contexto
-  const { theme } = useContext(ThemeContext);
+  // Leemos los ajustes actuales desde Redux
+  const { theme, language, detailLevel, tempChats } = useSelector(
+    (state: RootState) => state.settings
+  );
 
-  // Cargar settings iniciales (solo una vez)
-  useEffect(() => {
-    checkToken(dispatch);
-    if (token && !initialLoaded.current) {
-      getSettings({ token })
-        .then((data) => {
-          if (data?.settings && data.settings.length > 0) {
-            const settings = data.settings[0];
-            const initialSettings: SettingsForm = {
-              theme: settings.theme,
-              language: settings.language,
-              detailLevel: settings.detailLevel,
-              tempChats: settings.autoSaveChats,
-            };
-            setFormState(initialSettings);
-            setOldSettings(initialSettings);
-            initialLoaded.current = true;
-          }
-        })
-        .catch(console.error);
-    }
-  }, [dispatch, token]);
+  // Para manejar el formulario localmente (si quieres)
+  const [localForm, setLocalForm] = useState({
+    theme: theme ?? "light",
+    language: language ?? "es",
+    detailLevel: detailLevel ?? "simplified",
+    tempChats: tempChats ?? false,
+  });
 
-  // Cargar chats para el accordion
+  // Cargar chats
   useEffect(() => {
     checkToken(dispatch);
     if (token) {
       getChatsByUserId({ token })
-        .then(setChats)
-        .catch(console.error);
+        .then((data) => {
+          setChats(data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
     }
-  }, [dispatch, token]);
+  }, []);
 
-  // Si no se han cargado los settings, mostramos LoadingPage
-  if (!formState) {
+  // Sincronizar el store -> formulario si se cambia en otra parte
+  useEffect(() => {
+    setLocalForm({
+      theme: theme ?? "light",
+      language: language ?? "es",
+      detailLevel: detailLevel ?? "simplified",
+      tempChats: tempChats ?? false,
+    });
+  }, [theme, language, detailLevel, tempChats]);
+
+  if (isLoading) {
     return <LoadingPage />;
   }
 
+  // Manejador de inputs
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setFormState((prev) => ({
-      ...prev!,
+    const { name, type, value } = e.target;
+    setLocalForm((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
   const hasChanges = () => {
-    if (!oldSettings || !formState) return false;
     return (
-      formState.theme !== oldSettings.theme ||
-      formState.language !== oldSettings.language ||
-      formState.detailLevel !== oldSettings.detailLevel ||
-      formState.tempChats !== oldSettings.tempChats
+      localForm.theme !== (theme ?? "light") ||
+      localForm.language !== (language ?? "es") ||
+      localForm.detailLevel !== (detailLevel ?? "simplified") ||
+      localForm.tempChats !== (tempChats ?? false)
     );
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!token || !oldSettings) return;
+    if (!token) return;
 
-    setIsUpdating(true);
-    const payload = {
-      token,
-      theme: formState.theme,
-      language: formState.language,
-      detailLevel: formState.detailLevel,
-      autoSaveChats: formState.tempChats ? 1 : 0,
-    };
-
-    const response = await updateSettings(payload);
-    if (response?.ok) {
-      // Recargamos la página para aplicar el nuevo tema globalmente
-      window.location.reload();
-    } else {
-      setIsUpdating(false);
-    }
+    // Enviamos la actualización al backend y al store
+    dispatch(
+      updateSettingsThunk({
+        token,
+        theme: localForm.theme,
+        language: localForm.language,
+        detailLevel: localForm.detailLevel,
+        autoSaveChats: localForm.tempChats ? 0 : 1,
+      })
+    );
   };
 
   const handleDeleteChat = async (chatId: number) => {
     if (token) {
       await deleteChat({ token, chatId });
-      setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+      setChats((prev) => prev.filter((chat) => chat.id !== chatId));
     }
   };
 
-  // Clases para el "card" que envuelve el formulario
+  // Clases en base al theme
   const cardClasses =
     theme === "dark"
       ? "bg-gray-800 text-gray-100"
       : "bg-white text-black";
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className={`shadow-md rounded p-4 w-full max-w-xl ${cardClasses}`}>
         <h1 className="text-2xl font-bold mb-4">Configuración</h1>
 
@@ -132,12 +121,12 @@ export const SettingsPage = () => {
             <label className="block mb-1 font-semibold">Tema</label>
             <select
               name="theme"
-              className={`border border-gray-300 rounded w-full p-2 ${
-                theme === "dark" ? "bg-gray-700 text-gray-100" : "bg-white text-black"
-              }`}
-              value={formState.theme}
+              className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
+                ? "bg-gray-700 text-gray-100 border-gray-600"
+                : "bg-white text-black border-gray-300"
+                }`}
+              value={localForm.theme}
               onChange={handleInputChange}
-              disabled={isUpdating}
             >
               <option value="light">Claro</option>
               <option value="dark">Oscuro</option>
@@ -148,12 +137,12 @@ export const SettingsPage = () => {
             <label className="block mb-1 font-semibold">Idioma</label>
             <select
               name="language"
-              className={`border border-gray-300 rounded w-full p-2 ${
-                theme === "dark" ? "bg-gray-700 text-gray-100" : "bg-white text-black"
-              }`}
-              value={formState.language}
+              className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
+                ? "bg-gray-700 text-gray-100 border-gray-600"
+                : "bg-white text-black border-gray-300"
+                }`}
+              value={localForm.language}
               onChange={handleInputChange}
-              disabled={isUpdating}
             >
               <option value="es">Español</option>
               <option value="en">Inglés</option>
@@ -164,12 +153,12 @@ export const SettingsPage = () => {
             <label className="block mb-1 font-semibold">Nivel de detalle</label>
             <select
               name="detailLevel"
-              className={`border border-gray-300 rounded w-full p-2 ${
-                theme === "dark" ? "bg-gray-700 text-gray-100" : "bg-white text-black"
-              }`}
-              value={formState.detailLevel}
+              className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
+                  ? "bg-gray-700 text-gray-100 border-gray-600"
+                  : "bg-white text-black border-gray-300"
+                }`}
+              value={localForm.detailLevel}
               onChange={handleInputChange}
-              disabled={isUpdating}
             >
               <option value="simplified">Simplificado</option>
               <option value="detailed">Extenso</option>
@@ -182,19 +171,17 @@ export const SettingsPage = () => {
               type="checkbox"
               name="tempChats"
               className="h-5 w-5"
-              checked={formState.tempChats}
+              checked={localForm.tempChats}
               onChange={handleInputChange}
-              disabled={isUpdating}
             />
           </div>
 
           <div className="flex items-center justify-between mt-6">
             <button
               type="submit"
-              className={`px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500 ${
-                !hasChanges() || isUpdating ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={!hasChanges() || isUpdating}
+              className={`px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500 ${!hasChanges() ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              disabled={!hasChanges()}
             >
               Aplicar cambios
             </button>
@@ -207,7 +194,6 @@ export const SettingsPage = () => {
               type="button"
               className="flex items-center justify-between w-full font-semibold"
               onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-              disabled={isUpdating}
             >
               <span>Eliminar Chats</span>
               <span>{isAccordionOpen ? "▲" : "▼"}</span>
@@ -220,7 +206,6 @@ export const SettingsPage = () => {
                     <button
                       className="text-red-600 font-semibold hover:underline"
                       onClick={() => handleDeleteChat(chat.id)}
-                      disabled={isUpdating}
                     >
                       Eliminar
                     </button>

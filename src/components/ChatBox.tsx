@@ -1,13 +1,10 @@
-// ChatBox.tsx
-
 import { useForm } from "../hooks";
 import { ChatBoxProps, ChatFormProps } from "../interfaces";
-import { useEffect, useState, useRef, useContext } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Message } from "./Message";
 import { checkToken, fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
-import { ThemeContext } from "../context/ThemeContext";
 
 const SendIcon = () => (
   <svg
@@ -38,8 +35,11 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const { formState, handleInputChange, handleSubmit } = useForm(initialState);
   const dispatch = useDispatch();
 
-  // Obtenemos el tema desde el contexto
-  const { theme } = useContext(ThemeContext);
+
+
+  const { theme, detailLevel, language, tempChats } = useSelector((state: RootState) => state.settings);
+
+  
 
   useEffect(() => {
     if (context.length > 0) {
@@ -85,9 +85,9 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
 
     let response;
     if (newMessage.index === 0) {
-      response = await fetchGeminiApi({ text: newMessage.message });
+      response = await fetchGeminiApi({ text: newMessage.message, detailLevel, language });
     } else {
-      response = await fetchGeminiApi({ text: newMessage.message, context: newMessages });
+      response = await fetchGeminiApi({ text: newMessage.message, detailLevel, language, context: newMessages });
     }
     const chatTitle = response.response.split("//")[0].trim();
     const chatMessage = response.response.split("//").slice(1).join(" ").trim();

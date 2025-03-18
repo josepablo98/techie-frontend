@@ -28,6 +28,8 @@ export interface UpdateChatProps {
 export interface GeminiRequestProps {
     text: string;
     context?: ChatFormProps[];
+    detailLevel: string;
+    language: string;
 }
 
 export interface UpdateTitleProps {
@@ -88,7 +90,9 @@ export interface SettingsForm {
     tempChats: boolean;
 }
 
-export interface ThemeContextType {
-    theme: "light" | "dark";
-    setTheme: React.Dispatch<React.SetStateAction<"light" | "dark">>;
+export interface SettingsFormStore {
+    theme: string;
+    language: string
+    detailLevel: string
+    tempChats: boolean
 }

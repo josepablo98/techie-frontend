@@ -1,9 +1,10 @@
+import { useSelector } from "react-redux";
 import { MessageComponentProps } from "../interfaces";
-import { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { RootState } from "../store";
+
 
 export const Message = ({ text, isBotResponse }: MessageComponentProps) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useSelector((state: RootState) => state.settings);
 
   // Para el bot: un gris en claro, y un gris oscuro en modo oscuro
   const botBg = theme === "dark" ? "bg-gray-700 text-gray-100" : "bg-gray-100 text-black";

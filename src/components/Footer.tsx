@@ -1,9 +1,9 @@
-// components/Footer.tsx
-import { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+
 
 export const Footer = () => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useSelector((state: RootState) => state.settings);
 
   const footerClasses =
     theme === "dark"
