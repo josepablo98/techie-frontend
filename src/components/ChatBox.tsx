@@ -70,12 +70,12 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     formState.message = "";
 
     const token = localStorage.getItem("token");
-    if (newMessage.index === 0 && email && token) {
+    if (newMessage.index === 0 && email && token && !tempChats) {
       const data = await saveNewChat({ token, message: newMessage.message });
       if (data && data.chatId) {
         window.history.pushState(null, "", `/chat/${data.chatId}`);
       }
-    } else if (email && token) {
+    } else if (email && token && !tempChats) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
         token,

@@ -29,6 +29,7 @@ export const useForm = <T extends Record<string, any>>(initialState: T, validate
       }
     }
     callback(values);
+    setValues(initialState);
   }
 
   return {

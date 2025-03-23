@@ -58,6 +58,7 @@ export const RegisterPage = () => {
               type="text"
               placeholder="Nombre"
               name="name"
+              autoComplete="off"
               value={name}
               onChange={handleInputChange}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${isSubmitted && errors.name ? 'border-red-500' : 'focus:ring-blue-500'}`}
@@ -69,6 +70,7 @@ export const RegisterPage = () => {
               type="text"
               placeholder="Email"
               name="email"
+              autoComplete="off"
               value={email}
               onChange={handleInputChange}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${isSubmitted && errors.email ? 'border-red-500' : 'focus:ring-blue-500'}`}
@@ -80,6 +82,7 @@ export const RegisterPage = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="Contraseña"
               name="password"
+              autoComplete="new-password"
               value={password}
               onChange={handleInputChange}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${isSubmitted && errors.password ? 'border-red-500' : 'focus:ring-blue-500'}`}
@@ -94,6 +97,7 @@ export const RegisterPage = () => {
               type={showPassword2 ? 'text' : 'password'}
               placeholder="Repetir contraseña"
               name="password2"
+              autoComplete="new-password"
               value={password2}
               onChange={handleInputChange}
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${isSubmitted && errors.password2 ? 'border-red-500' : 'focus:ring-blue-500'}`}
