@@ -8,7 +8,7 @@ import { Chat } from "../interfaces";
 import { NavLink } from "react-router-dom";
 import { LoadingPage } from "./LoadingPage";
 
-export const SettingsPage = () => {
+const SettingsPage = () => {
   const dispatch: AppDispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [chats, setChats] = useState<Chat[]>([]);
@@ -219,3 +219,5 @@ export const SettingsPage = () => {
     </div>
   );
 };
+
+export default SettingsPage;

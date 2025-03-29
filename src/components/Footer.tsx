@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-
+import { NavLink } from "react-router-dom";
 
 export const Footer = () => {
   const { theme } = useSelector((state: RootState) => state.settings);
@@ -14,15 +14,15 @@ export const Footer = () => {
     <footer className={`${footerClasses} mt-1 py-2 shadow-lg`}>
       <div className="w-full flex justify-center px-4">
         <nav className="flex space-x-6">
-          <a href="/about" className="hover:underline">
+          <NavLink to="/about" className="hover:underline">
             Acerca de
-          </a>
-          <a href="/contact" className="hover:underline">
+          </NavLink>
+          <NavLink to="/contact" className="hover:underline">
             Contacto
-          </a>
-          <a href="/privacy" className="hover:underline">
+          </NavLink>
+          <NavLink to="/privacy" className="hover:underline">
             Política de privacidad
-          </a>
+          </NavLink>
         </nav>
       </div>
       <div className="border-t border-white mt-2 opacity-20"></div>

@@ -126,6 +126,7 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
   }
 }
 
+
 export const startLogout = () => {
   return async (dispatch: AppDispatch) => {
     localStorage.removeItem('token');

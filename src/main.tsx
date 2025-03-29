@@ -8,10 +8,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import './styles.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <Provider store={store}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <App />
-        <ToastContainer />
-      </BrowserRouter>
-    </Provider>
+  <Provider store={store}>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <App />
+      <ToastContainer />
+    </BrowserRouter>
+  </Provider>
 )

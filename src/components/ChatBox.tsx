@@ -125,7 +125,6 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     theme === "dark"
       ? "bg-gray-800"  // FONDO OSCURO
       : "bg-gray-100"; // FONDO CLARO (o blanco si prefieres)
-
   // Clases para el input en modo oscuro
   const inputClasses =
     theme === "dark"
