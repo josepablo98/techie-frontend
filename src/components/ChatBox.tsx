@@ -69,16 +69,14 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     setMessages(newMessages);
     formState.message = "";
 
-    const token = localStorage.getItem("token");
-    if (newMessage.index === 0 && email && token && !tempChats) {
-      const data = await saveNewChat({ token, message: newMessage.message });
+    if (newMessage.index === 0 && email && !tempChats) {
+      const data = await saveNewChat({ message: newMessage.message });
       if (data && data.chatId) {
         window.history.pushState(null, "", `/chat/${data.chatId}`);
       }
-    } else if (email && token && !tempChats) {
+    } else if (email && !tempChats) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
-        token,
         message: newMessage.message,
       });
     }
@@ -96,17 +94,15 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       index: newMessages.length,
     };
 
-    if (newMessage.index === 0 && email && token) {
+    if (newMessage.index === 0 && email) {
       await updateTitle({
         chatId: Number(window.location.pathname.split("/")[2]),
-        token,
         title: chatTitle,
       });
     }
-    if (email && token) {
+    if (email) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
-        token,
         message: chatMessage,
       });
     }

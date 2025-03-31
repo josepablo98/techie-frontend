@@ -1,39 +1,31 @@
 import { toast } from "react-toastify"
 import { RequestPasswordResetValuesProps, ResetPasswordValuesProps } from "../interfaces"
 import { AppDispatch } from "../store"
-import { login, logout } from "../store/auth"
+import { login, startLogout } from "../store/auth"
 
 export const checkToken = async (dispatch: AppDispatch) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    dispatch(logout({ message: "No token" }));
-  } else {
+ 
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const resp = await fetch('http://localhost:8080/auth/renew', {
+      const resp = await fetch('https://localhost:8080/auth/renew', {
         method: 'GET',
-        headers: {
-          'x-token': token
-        }
+        credentials: 'include',
       });
       if (!resp.ok) {
         throw new Error(`HTTP error! status: ${resp.status}`);
       }
       const data = await resp.json();
-      localStorage.setItem('token', data.token);
       dispatch(login(data));
     } catch (error) {
-      localStorage.removeItem('token');
-      dispatch(logout({ message: "Invalid token" }));
+      dispatch(startLogout());
     }
-  }
 };
 
 export const resetPassword = async (formValues: ResetPasswordValuesProps, token: string) => {
 
   try {
-    const response = await fetch('http://localhost:8080/auth/reset-password', {
+    const response = await fetch('https://localhost:8080/auth/reset-password', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -54,7 +46,7 @@ export const resetPassword = async (formValues: ResetPasswordValuesProps, token:
 
 export const sendResetPassword = async (formValues: RequestPasswordResetValuesProps) => {
   try {
-    const response = await fetch('http://localhost:8080/auth/request-password-reset', {
+    const response = await fetch('https://localhost:8080/auth/request-password-reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -76,7 +68,7 @@ export const sendResetPassword = async (formValues: RequestPasswordResetValuesPr
 export const verify = async (token: string) => {
   let data;
   try {
-    const response = await fetch("http://localhost:8080/auth/verify-email", {
+    const response = await fetch("https://localhost:8080/auth/verify-email", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

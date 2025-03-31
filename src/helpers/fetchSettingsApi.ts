@@ -1,14 +1,14 @@
-import { GetSettingsProps, UpdateSettingsProps } from "../interfaces";
+import { UpdateSettingsProps } from "../interfaces";
 
 
-export const getSettings = async ({ token } : GetSettingsProps) => {
+export const getSettings = async () => {
     try {
-        const resp = await fetch("http://localhost:8080/settings/get-settings", {
+        const resp = await fetch("https://localhost:8080/settings/get-settings", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ token }),
         })
         const data = await resp.json();
         return data;
@@ -17,14 +17,15 @@ export const getSettings = async ({ token } : GetSettingsProps) => {
     }
 }
 
-export const updateSettings = async ({ token, detailLevel, language, autoSaveChats, theme } : UpdateSettingsProps) => {
+export const updateSettings = async ({ detailLevel, language, autoSaveChats, theme } : UpdateSettingsProps) => {
     try {
-        const resp = await fetch("http://localhost:8080/settings/update-settings", {
+        const resp = await fetch("https://localhost:8080/settings/update-settings", {
             method: "PUT",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ token, detailLevel, language, autoSaveChats, theme }),
+            body: JSON.stringify({ detailLevel, language, autoSaveChats, theme }),
         });
         const data = await resp.json();
         return data;

@@ -10,15 +10,12 @@ const AccountInformationPage = () => {
     const [chatCount, setChatCount] = useState<number | null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            getChatsByUserId({ token })
-                .then((chats) => setChatCount(chats.length))
-                .catch((error) => {
-                    console.error("Error al obtener los chats:", error);
-                    setChatCount(null);
-                });
-        }
+        getChatsByUserId()
+            .then((chats) => setChatCount(chats.length))
+            .catch((error) => {
+                console.error("Error al obtener los chats:", error);
+                setChatCount(null);
+            });
     }, []);
 
     // Clases dinámicas basadas en el tema

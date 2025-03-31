@@ -14,19 +14,16 @@ const AccountInformationPage = lazy(() => import(/* webpackChunkName: "AccountIn
 
 export const PrivateRouter = () => {
   const dispatch: AppDispatch = useDispatch();
-  const token = localStorage.getItem("token");
   const { theme } = useSelector((state: RootState) => state.settings);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      dispatch(getSettingsThunk(token)).then(() => {
-        setIsLoading(false);
-      });
-    } else {
+    setIsLoading(true);
+    dispatch(getSettingsThunk()).finally(() => {
       setIsLoading(false);
-    }
-  }, [dispatch, token]);
+    })
+
+  }, [dispatch]);
 
   if (isLoading) {
     return <LoadingPage />;

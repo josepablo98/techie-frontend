@@ -18,7 +18,6 @@ const MenuIcon = () => (
 export const Header = () => {
   const { theme } = useSelector((state: RootState) => state.settings);
   const { chatId } = useParams<{ chatId: string }>();
-  const token = localStorage.getItem("token");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tit, setTit] = useState("TECHIE");
@@ -28,28 +27,27 @@ export const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (chatId && token) {
-      getChatByUserIdAndChatId({ token, chatId: Number(chatId) })
+    if (chatId) {
+      getChatByUserIdAndChatId({ chatId: Number(chatId) })
         .then((chat) => setTit(chat[0].title))
         .catch(console.error);
     } else {
       setTit("TECHIE");
     }
-  }, [chatId, token]);
+  }, [chatId]);
 
   const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     dispatch(startLogout());
+
     setIsMenuOpen(false);
   };
 
   const openModal = async () => {
     checkToken(dispatch);
-    if (token) {
       try {
-        const userChats = await getChatsByUserId({ token });
+        const userChats = await getChatsByUserId();
         if (userChats && userChats.length > 0) {
           setChats(userChats);
           setIsModalOpen(true);
@@ -60,7 +58,6 @@ export const Header = () => {
         console.error("Error cargando chats:", error);
         toast.error("Error cargando chats");
       }
-    }
     setIsMenuOpen(false);
   };
 

@@ -2,15 +2,16 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store";
-import { getChatsByUserId, deleteChat, checkToken } from "../helpers";
+import { getChatsByUserId, deleteChat, checkToken, deleteAllChats } from "../helpers";
 import { updateSettingsThunk } from "../store/settings/thunks";
 import { Chat } from "../interfaces";
 import { NavLink } from "react-router-dom";
 import { LoadingPage } from "./LoadingPage";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 const SettingsPage = () => {
   const dispatch: AppDispatch = useDispatch();
-  const token = localStorage.getItem("token");
   const [chats, setChats] = useState<Chat[]>([]);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,19 +32,17 @@ const SettingsPage = () => {
   // Cargar chats
   useEffect(() => {
     checkToken(dispatch);
-    if (token) {
-      getChatsByUserId({ token })
-        .then((data) => {
-          setChats(data);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    getChatsByUserId()
+      .then((data) => {
+        setChats(data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(false);
+      });
+
   }, []);
 
   // Sincronizar el store -> formulario si se cambia en otra parte
@@ -80,12 +79,10 @@ const SettingsPage = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!token) return;
 
     // Enviamos la actualización al backend y al store
     dispatch(
       updateSettingsThunk({
-        token,
         theme: localForm.theme,
         language: localForm.language,
         detailLevel: localForm.detailLevel,
@@ -95,9 +92,45 @@ const SettingsPage = () => {
   };
 
   const handleDeleteChat = async (chatId: number) => {
-    if (token) {
-      await deleteChat({ token, chatId });
-      setChats((prev) => prev.filter((chat) => chat.id !== chatId));
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará el chat permanentemente.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      const resp = await deleteChat({ chatId });
+      if (resp.ok) {
+        setChats((prev) => prev.filter((chat) => chat.id !== chatId));
+        toast.success(resp.message);
+      } else {
+        toast.error(resp.message);
+      }
+
+    }
+  };
+
+  const handleDeleteAllChats = async () => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará todos los chats permanentemente.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar todos",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      const resp = await deleteAllChats();
+      if (resp.ok) {
+        setChats([]);
+        toast.success(resp.message);
+      } else {
+        toast.error(resp.message);
+      }
     }
   };
 
@@ -154,8 +187,8 @@ const SettingsPage = () => {
             <select
               name="detailLevel"
               className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
-                  ? "bg-gray-700 text-gray-100 border-gray-600"
-                  : "bg-white text-black border-gray-300"
+                ? "bg-gray-700 text-gray-100 border-gray-600"
+                : "bg-white text-black border-gray-300"
                 }`}
               value={localForm.detailLevel}
               onChange={handleInputChange}
@@ -211,6 +244,14 @@ const SettingsPage = () => {
                     </button>
                   </li>
                 ))}
+                <li className="flex justify-center mt-4">
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+                    onClick={handleDeleteAllChats}
+                  >
+                    Eliminar todos los chats
+                  </button>
+                </li>
               </ul>
             )}
           </div>
@@ -218,6 +259,6 @@ const SettingsPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default SettingsPage;

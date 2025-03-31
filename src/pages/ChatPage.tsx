@@ -16,13 +16,11 @@ export const ChatPage = () => {
     checkToken(dispatch);
   }, [dispatch]);
 
-  const token = localStorage.getItem("token");
-
   useEffect(() => {
     const fetchChat = async () => {
-      if (chatId && token) {
+      if (chatId) {
         try {
-          const chat = await getChatByUserIdAndChatId({ token, chatId: Number(chatId) });
+          const chat = await getChatByUserIdAndChatId({ chatId: Number(chatId) });
           if (chat && chat[0] && chat[0].messages) {
             let messages = chat[0].messages;
             if (typeof messages === "string") {
@@ -49,7 +47,7 @@ export const ChatPage = () => {
     };
 
     fetchChat();
-  }, [chatId, token]);
+  }, [chatId]);
 
   return (
     <Layout>

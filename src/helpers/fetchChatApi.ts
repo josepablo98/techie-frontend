@@ -1,13 +1,14 @@
-import { DeleteChatProps, GeminiRequestProps, GetChatProps, GetChatsProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
+import { DeleteChatProps, GeminiRequestProps, GetChatProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
 
-export const saveNewChat = async ({ token, message }: SaveNewChatProps) => {
+export const saveNewChat = async ({ message }: SaveNewChatProps) => {
     try {
-        const resp = await fetch("http://localhost:8080/chat/create", {
+        const resp = await fetch("https://localhost:8080/chat/create", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ token, message }),
+            body: JSON.stringify({ message }),
         });
         const data = await resp.json();
         return data;
@@ -16,14 +17,15 @@ export const saveNewChat = async ({ token, message }: SaveNewChatProps) => {
     }
 };
 
-export const updateChat = async ({ chatId, token, message }: UpdateChatProps) => {
+export const updateChat = async ({ chatId, message }: UpdateChatProps) => {
     try {
-        const resp = await fetch(`http://localhost:8080/chat/update/${chatId}`, {
+        const resp = await fetch(`https://localhost:8080/chat/update/${chatId}`, {
             method: "PUT",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ token, message }),
+            body: JSON.stringify({ message }),
         });
         await resp.json();
     } catch (error) {
@@ -31,14 +33,15 @@ export const updateChat = async ({ chatId, token, message }: UpdateChatProps) =>
     }
 };
 
-export const updateTitle = async ({ chatId, token, title }: UpdateTitleProps) => {
+export const updateTitle = async ({ chatId, title }: UpdateTitleProps) => {
     try {
-        const resp = await fetch(`http://localhost:8080/chat/update-title/${chatId}`, {
+        const resp = await fetch(`https://localhost:8080/chat/update-title/${chatId}`, {
             method: "PUT",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ token, title }),
+            body: JSON.stringify({ title }),
         });
         await resp.json();
     } catch (error) {
@@ -62,14 +65,14 @@ export const fetchGeminiApi = async ({ text, context, detailLevel, language }: G
     }
 };
 
-export const getChatsByUserId = async ({ token }: GetChatsProps) => {
+export const getChatsByUserId = async () => {
     try {
-        const resp = await fetch("http://localhost:8080/chat/getchats", {
+        const resp = await fetch("https://localhost:8080/chat/getchats", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
+            }
         })
         const data = await resp.json();
         return data.chats;
@@ -78,14 +81,14 @@ export const getChatsByUserId = async ({ token }: GetChatsProps) => {
     }
 };
 
-export const getChatByUserIdAndChatId = async ({ token, chatId }: GetChatProps) => {
+export const getChatByUserIdAndChatId = async ({ chatId }: GetChatProps) => {
     try {
-        const resp = await fetch(`http://localhost:8080/chat/getchat/${chatId}`, {
+        const resp = await fetch(`https://localhost:8080/chat/getchat/${chatId}`, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
+            }
         })
         const data = await resp.json();
         return data.chat;
@@ -94,18 +97,34 @@ export const getChatByUserIdAndChatId = async ({ token, chatId }: GetChatProps) 
     }
 }
 
-export const deleteChat = async ({ token, chatId }: DeleteChatProps) => {
+export const deleteChat = async ({ chatId }: DeleteChatProps) => {
     try {
-        const resp = await fetch(`http://localhost:8080/chat/delete/${chatId}`, {
+        const resp = await fetch(`https://localhost:8080/chat/delete/${chatId}`, {
             method: "DELETE",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
+            }
         });
         const data = await resp.json();
         return data;
     } catch (error) {
         console.error("Error deleting chat", error);
+    }
+}
+
+export const deleteAllChats = async () => {
+    try {
+        const resp = await fetch("https://localhost:8080/chat/delete", {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        const data = await resp.json();
+        return data;
+    } catch (error) {
+        console.error("Error deleting all chats", error);
     }
 }

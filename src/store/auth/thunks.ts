@@ -5,13 +5,14 @@ import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import Swal from 'sweetalert2';
 
+
 export const startRegisteringWithEmailAndPassword = ({ email, password, name }: RegisterValuesProps) => {
   return async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
 
     try {
       const json = JSON.stringify({ email, password, name });
-      const response = await fetch('http://localhost:8080/auth/register', {
+      const response = await fetch('https://localhost:8080/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -32,7 +33,7 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name }: 
             cancelButtonText: 'Cancelar'
           }).then(async (result) => {
             if (result.isConfirmed) {
-              const response = await fetch('http://localhost:8080/auth/request-verified-email', {
+              const response = await fetch('https://localhost:8080/auth/request-verified-email', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -70,8 +71,9 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
 
     try {
       const json = JSON.stringify({ email, password });
-      const response = await fetch('http://localhost:8080/auth/login', {
+      const response = await fetch('https://localhost:8080/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -91,7 +93,7 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
             cancelButtonText: 'Cancelar'
           }).then(async (result) => {
             if (result.isConfirmed) {
-              const response = await fetch('http://localhost:8080/auth/request-verified-email', {
+              const response = await fetch('https://localhost:8080/auth/request-verified-email', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -114,7 +116,6 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
           return dispatch(logout(data));
         }
       }
-      localStorage.setItem('token', data.token!);
 
       toast.success(data.message);
 
@@ -129,7 +130,17 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
 
 export const startLogout = () => {
   return async (dispatch: AppDispatch) => {
-    localStorage.removeItem('token');
-    dispatch(logout({ message: 'Sesión cerrada' }));
+    try {
+      await fetch("https://localhost:8080/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      dispatch(logout({ message: "Sesión cerrada" }));
+    } catch (error) {
+      console.error("Error durante el logout:", error);
+    }
   }
 }

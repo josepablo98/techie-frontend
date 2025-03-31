@@ -6,7 +6,6 @@ import { UpdateSettingsProps } from "../../interfaces";
 
 // Thunk para ACTUALIZAR ajustes (persistencia en DB + store)
 export const updateSettingsThunk = ({
-    token,
     detailLevel,
     language,
     autoSaveChats,
@@ -15,7 +14,6 @@ export const updateSettingsThunk = ({
     return async (dispatch: AppDispatch) => {
         try {
             const data = await updateSettings({
-                token,
                 detailLevel,
                 language,
                 autoSaveChats,
@@ -42,10 +40,10 @@ export const updateSettingsThunk = ({
     };
 };
 
-export const getSettingsThunk = (token: string) => {
+export const getSettingsThunk = () => {
     return async (dispatch: AppDispatch) => {
         try {
-            const data = await getSettings({ token });
+            const data = await getSettings();
             if (data?.ok && data.settings.length > 0) {
                 const s = data.settings[0];
                 const tempChats = !s.autoSaveChats;
