@@ -99,6 +99,11 @@ const SettingsPage = () => {
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
+      customClass: {
+        popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
+        confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
+        cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+      },
     });
 
     if (result.isConfirmed) {
@@ -109,7 +114,6 @@ const SettingsPage = () => {
       } else {
         toast.error(resp.message);
       }
-
     }
   };
 
@@ -121,6 +125,11 @@ const SettingsPage = () => {
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar todos",
       cancelButtonText: "Cancelar",
+      customClass: {
+        popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
+        confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
+        cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+      },
     });
 
     if (result.isConfirmed) {
@@ -245,12 +254,14 @@ const SettingsPage = () => {
                   </li>
                 ))}
                 <li className="flex justify-center mt-4">
-                  <button
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
-                    onClick={handleDeleteAllChats}
-                  >
-                    Eliminar todos los chats
-                  </button>
+                    <div className="mt-4">
+                    <button
+                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+                      onClick={handleDeleteAllChats}
+                    >
+                      Eliminar todos los chats
+                    </button>
+                    </div>
                 </li>
               </ul>
             )}

@@ -27,6 +27,18 @@ button, a {
     animation: spin 2s linear infinite;
   }
 
+  .swal2-popup {
+    border-radius: 8px;
+  }
+  .swal2-confirm {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+  }
+  .swal2-cancel {
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+  }
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
