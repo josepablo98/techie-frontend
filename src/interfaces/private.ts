@@ -1,7 +1,12 @@
+import { AppDispatch } from "../store";
 
 export interface ChatFormProps {
     message: string;
     index: number;
+}
+
+export interface CheckTokenProps {
+    dispatch: AppDispatch;
 }
 
 export interface ChatBoxProps {
@@ -16,11 +21,13 @@ export interface MessageComponentProps {
 
 export interface SaveNewChatProps {
     message: string;
+    language: string;
 }
 
 export interface UpdateChatProps {
     chatId: number;
     message: string;
+    language: string;
 }
 
 export interface GeminiRequestProps {
@@ -33,17 +40,27 @@ export interface GeminiRequestProps {
 export interface UpdateTitleProps {
     title: string;
     chatId: number;
+    language: string;
 }
 
 
 export interface GetChatProps {
     chatId: number;
+    language: string;
 }
 
 export interface DeleteChatProps {
     chatId: number;
+    language: string;
 }
 
+export interface DeleteAllChatsProps {
+    language: string;
+}
+
+export interface GetChatsByUserIdProps {
+    language: string;
+}
 
 export interface ChatHistoryModalProps {
     open: boolean;
@@ -56,9 +73,24 @@ export interface Chat {
     title: string;
 }
 
+export interface GetSettingsProps {
+    language: string;
+}
+
+export interface GetSettingsThunkProps {
+    language: string;
+}
+
 export interface UpdateSettingsProps {
+    language: string;
     theme?: string;
-    language?: string;
+    detailLevel?: string;
+    autoSaveChats?: number;
+}
+
+export interface UpdateSettingsThunkProps {
+    language: string;
+    theme?: string;
     detailLevel?: string;
     autoSaveChats?: number;
 }
@@ -79,7 +111,7 @@ export interface SettingsForm {
 
 export interface SettingsFormStore {
     theme: string;
-    language: string
-    detailLevel: string
-    tempChats: boolean
+    language: string;
+    detailLevel: string;
+    tempChats: boolean;
 }

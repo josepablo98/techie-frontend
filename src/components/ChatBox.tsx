@@ -34,10 +34,10 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { formState, handleInputChange, handleSubmit } = useForm(initialState);
   const dispatch = useDispatch();
-
-
-
   const { theme, detailLevel, language, tempChats } = useSelector((state: RootState) => state.settings);
+
+
+
 
   
 
@@ -57,7 +57,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   }, [messages]);
 
   const onSubmit = async () => {
-    checkToken(dispatch);
+    checkToken({ dispatch });
     if (formState.message === "") return;
 
     setIsLoading(true);
@@ -70,7 +70,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     formState.message = "";
 
     if (newMessage.index === 0 && email && !tempChats) {
-      const data = await saveNewChat({ message: newMessage.message });
+      const data = await saveNewChat({ message: newMessage.message, language });
       if (data && data.chatId) {
         window.history.pushState(null, "", `/chat/${data.chatId}`);
       }
@@ -78,6 +78,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
         message: newMessage.message,
+        language
       });
     }
 
@@ -98,12 +99,14 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       await updateTitle({
         chatId: Number(window.location.pathname.split("/")[2]),
         title: chatTitle,
+        language
       });
     }
     if (email) {
       await updateChat({
         chatId: Number(window.location.pathname.split("/")[2]),
         message: chatMessage,
+        language
       });
     }
 
@@ -145,7 +148,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
         <input
           type="text"
           name="message"
-          placeholder="Escribe un mensaje..."
+          placeholder={language === "es" ? "Escribe un mensaje..." : "Type a message..."}
           autoComplete="off"
           className={`flex-1 mr-2 h-10 border border-gray-300 rounded px-2 disabled:bg-gray-100 ${inputClasses}`}
           value={formState.message}

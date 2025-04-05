@@ -3,7 +3,7 @@ import { RootState } from "../store";
 import { NavLink } from "react-router-dom";
 
 const ContactPage = () => {
-  const { theme } = useSelector((state: RootState) => state.settings);
+  const { theme, language } = useSelector((state: RootState) => state.settings);
 
   // Clases condicionales según el tema
   const containerClasses =
@@ -22,10 +22,14 @@ const ContactPage = () => {
     >
       <div className={`max-w-4xl w-full rounded-lg p-8 ${cardClasses}`}>
         <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400 mb-6">
-          Contacto
+          {language === "es" && "Contacto"}
+          {language === "en" && "Contact"}
+          {!["en", "es"].includes(language) && "Contacto"}
         </h1>
         <p className="text-lg leading-relaxed text-center">
-          Si necesitas ponerte en contacto con nosotros, puedes escribirnos a:
+          {language === "es" && "Si necesitas ponerte en contacto con nosotros, puedes escribirnos a:"}
+          {language === "en" && "If you need to contact us, you can write to:"}
+          {!["en", "es"].includes(language) && "Si necesitas ponerte en contacto con nosotros, puedes escribirnos a:"}
         </p>
         <p className="text-lg leading-relaxed text-center mt-4">
           <a
@@ -40,7 +44,9 @@ const ContactPage = () => {
             to="/chat"
             className="text-blue-600 dark:text-blue-400 hover:underline text-xl font-semibold"
           >
-            ← Atrás
+            {language === "es" && "← Atrás"}
+            {language === "en" && "← Back"}
+            {!["en", "es"].includes(language) && "← Atrás"}
           </NavLink>
         </div>
       </div>

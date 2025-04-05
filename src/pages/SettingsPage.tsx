@@ -31,9 +31,9 @@ const SettingsPage = () => {
 
   // Cargar chats
   useEffect(() => {
-    checkToken(dispatch);
+    checkToken({ dispatch });
     setIsLoading(true);
-    getChatsByUserId()
+    getChatsByUserId({ language })
       .then((data) => {
         setChats(data);
         setIsLoading(false);
@@ -93,12 +93,12 @@ const SettingsPage = () => {
 
   const handleDeleteChat = async (chatId: number) => {
     const result = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "Esta acción eliminará el chat permanentemente.",
+      title: language === "es" ? "¿Estás seguro?" : "Are you sure?",
+      text: language === "es" ? "Esta acción eliminará el chat permanentemente." : "This action will permanently delete the chat.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: language === "es" ? "Sí, eliminar" : "Yes, delete",
+      cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
       customClass: {
         popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
         confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
@@ -107,7 +107,7 @@ const SettingsPage = () => {
     });
 
     if (result.isConfirmed) {
-      const resp = await deleteChat({ chatId });
+      const resp = await deleteChat({ chatId, language });
       if (resp.ok) {
         setChats((prev) => prev.filter((chat) => chat.id !== chatId));
         toast.success(resp.message);
@@ -119,12 +119,12 @@ const SettingsPage = () => {
 
   const handleDeleteAllChats = async () => {
     const result = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "Esta acción eliminará todos los chats permanentemente.",
+      title: language === "es" ? "¿Estás seguro?" : "Are you sure?",
+      text: language === "es" ? "Esta acción eliminará todos los chats permanentemente." : "This action will permanently delete all chats.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, eliminar todos",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: language === "es" ? "Sí, eliminar todos" : "Yes, delete all",
+      cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
       customClass: {
         popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
         confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
@@ -133,7 +133,7 @@ const SettingsPage = () => {
     });
 
     if (result.isConfirmed) {
-      const resp = await deleteAllChats();
+      const resp = await deleteAllChats({ language });
       if (resp.ok) {
         setChats([]);
         toast.success(resp.message);
@@ -152,15 +152,25 @@ const SettingsPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className={`shadow-md rounded p-4 w-full max-w-xl ${cardClasses}`}>
-        <h1 className="text-2xl font-bold mb-4">Configuración</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          {language === "es" && "Configuración"}
+          {language === "en" && "Settings"}
+          {!["es", "en"].includes(language) && "Configuración"} 
+        </h1>
 
         <NavLink to="/chat" className="block mb-4 text-blue-600 hover:underline">
-          ← Atrás
+          {language === "es" && "← Atrás"}
+          {language === "en" && "← Back"}
+          {!["es", "en"].includes(language) && "← Atrás"}
         </NavLink>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-1 font-semibold">Tema</label>
+            <label className="block mb-1 font-semibold">
+              {language === "es" && "Tema"}
+              {language === "en" && "Theme"}
+              {!["es", "en"].includes(language) && "Tema"}
+            </label>
             <select
               name="theme"
               className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
@@ -170,13 +180,25 @@ const SettingsPage = () => {
               value={localForm.theme}
               onChange={handleInputChange}
             >
-              <option value="light">Claro</option>
-              <option value="dark">Oscuro</option>
+              <option value="light">
+                {language === "es" && "Claro"}
+                {language === "en" && "Light"}
+                {!["es", "en"].includes(language) && "Claro"}
+              </option>
+              <option value="dark">
+                {language === "es" && "Oscuro"}
+                {language === "en" && "Dark"}
+                {!["es", "en"].includes(language) && "Oscuro"}
+              </option>
             </select>
           </div>
 
           <div className="mb-4">
-            <label className="block mb-1 font-semibold">Idioma</label>
+            <label className="block mb-1 font-semibold">
+              {language === "es" && "Idioma"}
+              {language === "en" && "Language"}
+              {!["es", "en"].includes(language) && "Idioma"}
+            </label>
             <select
               name="language"
               className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
@@ -186,13 +208,25 @@ const SettingsPage = () => {
               value={localForm.language}
               onChange={handleInputChange}
             >
-              <option value="es">Español</option>
-              <option value="en">Inglés</option>
+              <option value="es">
+                {language === "es" && "Español"}
+                {language === "en" && "Spanish"}
+                {!["es", "en"].includes(language) && "Español"}
+              </option>
+              <option value="en">
+                {language === "es" && "Inglés"}
+                {language === "en" && "English"}
+                {!["es", "en"].includes(language) && "Inglés"}
+              </option>
             </select>
           </div>
 
           <div className="mb-4">
-            <label className="block mb-1 font-semibold">Nivel de detalle</label>
+            <label className="block mb-1 font-semibold">
+              {language === "es" && "Nivel de detalle"}
+              {language === "en" && "Detail Level"}
+              {!["es", "en"].includes(language) && "Nivel de detalle"}
+            </label>
             <select
               name="detailLevel"
               className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
@@ -202,13 +236,25 @@ const SettingsPage = () => {
               value={localForm.detailLevel}
               onChange={handleInputChange}
             >
-              <option value="simplified">Simplificado</option>
-              <option value="detailed">Extenso</option>
+              <option value="simplified">
+                {language === "es" && "Simplificado"}
+                {language === "en" && "Simplified"}
+                {!["es", "en"].includes(language) && "Simplificado"}
+              </option>
+              <option value="detailed">
+                {language === "es" && "Detallado"}
+                {language === "en" && "Detailed"}
+                {!["es", "en"].includes(language) && "Detallado"}
+              </option>
             </select>
           </div>
 
           <div className="flex items-center justify-between my-4">
-            <span className="font-semibold">Chats temporales</span>
+            <span className="font-semibold">
+              {language === "es" && "Chats temporales"}
+              {language === "en" && "Temporary Chats"}
+              {!["es", "en"].includes(language) && "Chats temporales"}
+            </span>
             <input
               type="checkbox"
               name="tempChats"
@@ -225,7 +271,9 @@ const SettingsPage = () => {
                 }`}
               disabled={!hasChanges()}
             >
-              Aplicar cambios
+              {language === "es" && "Aplicar cambios"}
+              {language === "en" && "Apply changes"}
+              {!["es", "en"].includes(language) && "Aplicar cambios"}
             </button>
           </div>
         </form>
@@ -237,7 +285,11 @@ const SettingsPage = () => {
               className="flex items-center justify-between w-full font-semibold"
               onClick={() => setIsAccordionOpen(!isAccordionOpen)}
             >
-              <span>Eliminar Chats</span>
+              <span>
+                {language === "es" && "Eliminar Chats"}
+                {language === "en" && "Delete Chats"}
+                {!["es", "en"].includes(language) && "Eliminar Chats"}
+              </span>
               <span>{isAccordionOpen ? "▲" : "▼"}</span>
             </button>
             {isAccordionOpen && (
@@ -249,7 +301,9 @@ const SettingsPage = () => {
                       className="text-red-600 font-semibold hover:underline"
                       onClick={() => handleDeleteChat(chat.id)}
                     >
-                      Eliminar
+                      {language === "es" && "Eliminar"}
+                      {language === "en" && "Delete"}
+                      {!["es", "en"].includes(language) && "Eliminar"}
                     </button>
                   </li>
                 ))}
@@ -259,7 +313,9 @@ const SettingsPage = () => {
                       className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
                       onClick={handleDeleteAllChats}
                     >
-                      Eliminar todos los chats
+                      {language === "es" && "Eliminar todos los chats"}
+                      {language === "en" && "Delete all chats"}
+                      {!["es", "en"].includes(language) && "Eliminar todos los chats"}
                     </button>
                     </div>
                 </li>

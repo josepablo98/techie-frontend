@@ -14,12 +14,12 @@ const AccountInformationPage = lazy(() => import(/* webpackChunkName: "AccountIn
 
 export const PrivateRouter = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { theme } = useSelector((state: RootState) => state.settings);
+  const { theme, language } = useSelector((state: RootState) => state.settings);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(getSettingsThunk()).finally(() => {
+    dispatch(getSettingsThunk({ language })).finally(() => {
       setIsLoading(false);
     })
 

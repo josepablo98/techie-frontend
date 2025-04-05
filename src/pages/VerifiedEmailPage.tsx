@@ -7,6 +7,7 @@ export const VerifiedEmailPage = () => {
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const location = useLocation();
+  const language = localStorage.getItem("publicLanguage") || "es";
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -14,14 +15,13 @@ export const VerifiedEmailPage = () => {
 
     const verifyEmail = async () => {
       try {
-        const data = await verify(token!);
+        const data = await verify({ token, language });
         if (data.ok) {
           setIsSuccess(true);
-          setMessage("Cuenta verificada correctamente");
         } else {
           setIsSuccess(false);
-          setMessage(data.message);
         }
+        setMessage(data.message);
       } catch (error) {
         setIsSuccess(false);
         setMessage("No es posible verificar la cuenta, contacte con el administrador");
@@ -40,7 +40,15 @@ export const VerifiedEmailPage = () => {
     >
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <h1 className={`text-2xl font-bold text-center ${isSuccess ? "text-green-500" : "text-red-500"}`}>
-          {isSuccess ? "¡Éxito!" : "Error"}
+          {
+            language === "es"
+              ? isSuccess
+                ? "¡Éxito!"
+                : "Error"
+              : isSuccess
+                ? "Success!"
+                : "Error"
+          }
         </h1>
         <p className="text-center">{message}</p>
       </div>

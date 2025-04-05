@@ -4,23 +4,25 @@ import { ChatBox } from "../components";
 import { Layout } from "../layout/Layout";
 import { checkToken, getChatByUserIdAndChatId } from "../helpers";
 import { ChatFormProps } from "../interfaces";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
 
 export const ChatPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [context, setContext] = useState<ChatFormProps[]>([]);
   const dispatch = useDispatch();
+  const { language } = useSelector((state: RootState) => state.settings);
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkToken(dispatch);
+    checkToken({ dispatch });
   }, [dispatch]);
 
   useEffect(() => {
     const fetchChat = async () => {
       if (chatId) {
         try {
-          const chat = await getChatByUserIdAndChatId({ chatId: Number(chatId) });
+          const chat = await getChatByUserIdAndChatId({ chatId: Number(chatId), language });
           if (chat && chat[0] && chat[0].messages) {
             let messages = chat[0].messages;
             if (typeof messages === "string") {

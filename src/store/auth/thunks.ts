@@ -1,12 +1,14 @@
-import { RegisterFetchProps, LoginFetchProps, LoginValuesProps, RegisterValuesProps } from './../../interfaces/public'; "../../interfaces";
+import { RegisterFetchProps, LoginFetchProps, RegisterValuesFetchProps, LoginValuesFetchProps } from './../../interfaces/public'; "../../interfaces";
 import { checkingCredentials, login, logout } from "./authSlice";
 import { AppDispatch } from '../store';
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import Swal from 'sweetalert2';
+import { clearSettings, setSettings } from '../settings';
+import { sendVerifyEmail } from '../../helpers';
 
 
-export const startRegisteringWithEmailAndPassword = ({ email, password, name }: RegisterValuesProps) => {
+export const startRegisteringWithEmailAndPassword = ({ email, password, name, language }: RegisterValuesFetchProps) => {
   return async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
 
@@ -15,7 +17,8 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name }: 
       const response = await fetch('https://localhost:8080/auth/register', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept-Language': language,
         },
         body: json
       });
@@ -33,21 +36,7 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name }: 
             cancelButtonText: 'Cancelar'
           }).then(async (result) => {
             if (result.isConfirmed) {
-              const response = await fetch('https://localhost:8080/auth/request-verified-email', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email })
-              });
-
-              const data = await response.json();
-
-              if (!data.ok) {
-                return toast.error(data.message);
-              }
-
-              toast.success(data.message);
+              await sendVerifyEmail({ email, language })
             }
           });
         } else {
@@ -65,7 +54,7 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name }: 
   }
 }
 
-export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesProps) => {
+export const startLoginWithEmailAndPassword = ({ email, password, language }: LoginValuesFetchProps) => {
   return async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
 
@@ -75,7 +64,8 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
         method: 'POST',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept-Language': language,
         },
         body: json
       });
@@ -93,21 +83,7 @@ export const startLoginWithEmailAndPassword = ({ email, password }: LoginValuesP
             cancelButtonText: 'Cancelar'
           }).then(async (result) => {
             if (result.isConfirmed) {
-              const response = await fetch('https://localhost:8080/auth/request-verified-email', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email })
-              });
-
-              const data = await response.json();
-
-              if (!data.ok) {
-                return toast.error(data.message);
-              }
-
-              toast.success(data.message);
+              await sendVerifyEmail({ email, language })
             }
           });
           return dispatch(logout(data));
@@ -137,8 +113,14 @@ export const startLogout = () => {
         headers: {
           "Content-Type": "application/json",
         },
-      })
+      });
+
+      const publicLanguage = localStorage.getItem("publicLanguage") || "es";
+
+      dispatch(setSettings({ language:  publicLanguage }));
+
       dispatch(logout({ message: "Sesión cerrada" }));
+      dispatch(clearSettings());
     } catch (error) {
       console.error("Error durante el logout:", error);
     }

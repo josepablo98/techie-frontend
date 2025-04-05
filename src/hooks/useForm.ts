@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export const useForm = <T extends Record<string, any>>(initialState: T, validate?: (values: T) => Record<string, string>) => {
+export const useForm = <T extends Record<string, any>>(initialState: T, validate?: (values: T, language?: string) => Record<string, string>, language?: string) => {
   const [values, setValues] = useState(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -13,7 +13,7 @@ export const useForm = <T extends Record<string, any>>(initialState: T, validate
     });
 
     if (isSubmitted && validate) {
-      const newErrors = validate({ ...values, [name]: value });
+      const newErrors = validate({ ...values, [name]: value }, language);
       setErrors(newErrors);
     }
   }
@@ -22,7 +22,7 @@ export const useForm = <T extends Record<string, any>>(initialState: T, validate
     ev.preventDefault();
     setIsSubmitted(true);
     if (validate) {
-      const newErrors = validate(values);
+      const newErrors = validate(values, language);
       setErrors(newErrors);
       if (Object.keys(newErrors).length > 0) {
         return;
@@ -31,6 +31,11 @@ export const useForm = <T extends Record<string, any>>(initialState: T, validate
     callback(values);
     setValues(initialState);
   }
+
+  useEffect(() => {
+    const newErrors = validate && validate(values, language);
+    setErrors(newErrors!);
+  }, [language, values, validate]);
 
   return {
     formState: values,

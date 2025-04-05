@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { AppDispatch } from "../store";
 import { setSettings } from "./settingsSlice";
 import { updateSettings, getSettings } from "../../helpers";
-import { UpdateSettingsProps } from "../../interfaces";
+import { GetSettingsThunkProps, UpdateSettingsThunkProps } from "../../interfaces";
 
 // Thunk para ACTUALIZAR ajustes (persistencia en DB + store)
 export const updateSettingsThunk = ({
@@ -10,7 +10,7 @@ export const updateSettingsThunk = ({
     language,
     autoSaveChats,
     theme,
-}: UpdateSettingsProps) => {
+}: UpdateSettingsThunkProps) => {
     return async (dispatch: AppDispatch) => {
         try {
             const data = await updateSettings({
@@ -40,10 +40,10 @@ export const updateSettingsThunk = ({
     };
 };
 
-export const getSettingsThunk = () => {
+export const getSettingsThunk = ({ language }: GetSettingsThunkProps) => {
     return async (dispatch: AppDispatch) => {
         try {
-            const data = await getSettings();
+            const data = await getSettings({ language });
             if (data?.ok && data.settings.length > 0) {
                 const s = data.settings[0];
                 const tempChats = !s.autoSaveChats;

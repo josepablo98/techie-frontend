@@ -16,7 +16,7 @@ const MenuIcon = () => (
 );
 
 export const Header = () => {
-  const { theme } = useSelector((state: RootState) => state.settings);
+  const { theme, language } = useSelector((state: RootState) => state.settings);
   const { chatId } = useParams<{ chatId: string }>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +28,7 @@ export const Header = () => {
 
   useEffect(() => {
     if (chatId) {
-      getChatByUserIdAndChatId({ chatId: Number(chatId) })
+      getChatByUserIdAndChatId({ chatId: Number(chatId), language })
         .then((chat) => setTit(chat[0].title))
         .catch(console.error);
     } else {
@@ -45,18 +45,32 @@ export const Header = () => {
   };
 
   const openModal = async () => {
-    checkToken(dispatch);
+    checkToken({ dispatch });
       try {
-        const userChats = await getChatsByUserId();
+        const userChats = await getChatsByUserId({ language });
         if (userChats && userChats.length > 0) {
           setChats(userChats);
           setIsModalOpen(true);
         } else {
-          toast.info("No hay chats disponibles");
+          switch (language) {
+            case "en":
+              toast.info("You have no saved chats");
+              break;
+            case "es":
+              toast.info("No tienes chats guardados");
+              break;
+          }
         }
       } catch (error) {
         console.error("Error cargando chats:", error);
-        toast.error("Error cargando chats");
+        switch (language) {
+          case "en":
+            toast.error("Error loading chats");
+            break;
+          case "es":
+            toast.error("Error al cargar los chats");
+            break;
+        }
       }
     setIsMenuOpen(false);
   };
@@ -65,7 +79,7 @@ export const Header = () => {
 
   const handleNewChat = () => {
     navigate("/newchat", { replace: true });
-    checkToken(dispatch);
+    checkToken({ dispatch });
     setIsMenuOpen(false);
   };
 
@@ -85,7 +99,9 @@ export const Header = () => {
       <header className={`${headerClasses} w-full`}>
         <div className="grid grid-cols-3 items-center px-4 py-2">
           <div>
-            <span className="text-xl font-semibold">{`Buenas, ${name}`}</span>
+            {language === "en" && <span className="text-xl font-semibold">Welcome, {name}</span>}
+            {language === "es" && <span className="text-xl font-semibold">Bienvenido, {name}</span>}
+            {!["en", "es"].includes(language) && <span className="text-xl font-semibold">Bienvenido, {name}!</span>}
           </div>
           <div className="flex justify-center">
             <h1 className="text-2xl font-bold">{tit}</h1>
@@ -95,7 +111,9 @@ export const Header = () => {
               className="bg-yellow-400 text-black px-3 py-1 rounded hover:bg-yellow-300"
               onClick={handleNewChat}
             >
-              Nuevo Chat
+              {language === "en" && "New Chat"}
+              {language === "es" && "Nuevo Chat"}
+              {!["en", "es"].includes(language) && "Nuevo Chat"}
             </button>
             <button onClick={handleMenuToggle} className="p-2 hover:bg-blue-500 rounded">
               <MenuIcon />
@@ -111,7 +129,9 @@ export const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="hover:underline"
                 >
-                  Información de cuenta
+                  {language === "en" && "Account Information"}
+                  {language === "es" && "Información de cuenta"}
+                  {!["en", "es"].includes(language) && "Información de cuenta"}
                 </NavLink>
               </li>
               <li>
@@ -120,17 +140,23 @@ export const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="hover:underline"
                 >
-                  Configuración
+                  {language === "en" && "Settings"}
+                  {language === "es" && "Configuración"}
+                  {!["en", "es"].includes(language) && "Configuración"}
                 </NavLink>
               </li>
               <li>
                 <button onClick={openModal} className="hover:underline">
-                  Historial de chats
+                  {language === "en" && "Chat History"}
+                  {language === "es" && "Historial de Chats"}
+                  {!["en", "es"].includes(language) && "Historial de Chats"}
                 </button>
               </li>
               <li>
                 <button onClick={handleLogout} className="text-red-200 hover:text-red-300">
-                  Cerrar sesión
+                  {language === "en" && "Logout"}
+                  {language === "es" && "Cerrar sesión"}
+                  {!["en", "es"].includes(language) && "Cerrar sesión"}
                 </button>
               </li>
             </ul>

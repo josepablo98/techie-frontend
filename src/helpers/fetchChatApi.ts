@@ -1,12 +1,13 @@
-import { DeleteChatProps, GeminiRequestProps, GetChatProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
+import { DeleteAllChatsProps, DeleteChatProps, GeminiRequestProps, GetChatProps, GetChatsByUserIdProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
 
-export const saveNewChat = async ({ message }: SaveNewChatProps) => {
+export const saveNewChat = async ({ message, language }: SaveNewChatProps) => {
     try {
         const resp = await fetch("https://localhost:8080/chat/create", {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Accept-Language": language,
             },
             body: JSON.stringify({ message }),
         });
@@ -17,13 +18,14 @@ export const saveNewChat = async ({ message }: SaveNewChatProps) => {
     }
 };
 
-export const updateChat = async ({ chatId, message }: UpdateChatProps) => {
+export const updateChat = async ({ chatId, message, language }: UpdateChatProps) => {
     try {
         const resp = await fetch(`https://localhost:8080/chat/update/${chatId}`, {
             method: "PUT",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Accept-Language": language,
             },
             body: JSON.stringify({ message }),
         });
@@ -33,13 +35,14 @@ export const updateChat = async ({ chatId, message }: UpdateChatProps) => {
     }
 };
 
-export const updateTitle = async ({ chatId, title }: UpdateTitleProps) => {
+export const updateTitle = async ({ chatId, title, language }: UpdateTitleProps) => {
     try {
         const resp = await fetch(`https://localhost:8080/chat/update-title/${chatId}`, {
             method: "PUT",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Accept-Language": language,
             },
             body: JSON.stringify({ title }),
         });
@@ -65,13 +68,14 @@ export const fetchGeminiApi = async ({ text, context, detailLevel, language }: G
     }
 };
 
-export const getChatsByUserId = async () => {
+export const getChatsByUserId = async ({ language } : GetChatsByUserIdProps) => {
     try {
         const resp = await fetch("https://localhost:8080/chat/getchats", {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Accept-Language": language,
             }
         })
         const data = await resp.json();
@@ -81,13 +85,14 @@ export const getChatsByUserId = async () => {
     }
 };
 
-export const getChatByUserIdAndChatId = async ({ chatId }: GetChatProps) => {
+export const getChatByUserIdAndChatId = async ({ chatId , language}: GetChatProps) => {
     try {
         const resp = await fetch(`https://localhost:8080/chat/getchat/${chatId}`, {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Accept-Language": language,
             }
         })
         const data = await resp.json();
@@ -97,13 +102,14 @@ export const getChatByUserIdAndChatId = async ({ chatId }: GetChatProps) => {
     }
 }
 
-export const deleteChat = async ({ chatId }: DeleteChatProps) => {
+export const deleteChat = async ({ chatId, language }: DeleteChatProps) => {
     try {
         const resp = await fetch(`https://localhost:8080/chat/delete/${chatId}`, {
             method: "DELETE",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Accept-Language": language,
             }
         });
         const data = await resp.json();
@@ -113,13 +119,14 @@ export const deleteChat = async ({ chatId }: DeleteChatProps) => {
     }
 }
 
-export const deleteAllChats = async () => {
+export const deleteAllChats = async ({ language }: DeleteAllChatsProps) => {
     try {
         const resp = await fetch("https://localhost:8080/chat/delete", {
             method: "DELETE",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Accept-Language": language,
             }
         })
         const data = await resp.json();

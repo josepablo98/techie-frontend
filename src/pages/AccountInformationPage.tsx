@@ -6,11 +6,11 @@ import { NavLink } from "react-router-dom";
 
 const AccountInformationPage = () => {
     const { name, email } = useSelector((state: RootState) => state.auth);
-    const { theme } = useSelector((state: RootState) => state.settings); // Obtener el tema
+    const { theme, language } = useSelector((state: RootState) => state.settings); // Obtener el tema
     const [chatCount, setChatCount] = useState<number | null>(null);
 
     useEffect(() => {
-        getChatsByUserId()
+        getChatsByUserId({ language })
             .then((chats) => setChatCount(chats.length))
             .catch((error) => {
                 console.error("Error al obtener los chats:", error);
@@ -32,25 +32,43 @@ const AccountInformationPage = () => {
     return (
         <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${containerClasses}`}>
             <div className={`rounded p-6 w-full max-w-md ${cardClasses}`}>
-                <h1 className="text-2xl font-bold mb-4">Información de la Cuenta</h1>
+                <h1 className="text-2xl font-bold mb-4">
+                    {language === "es" && "Información de la Cuenta"}
+                    {language === "en" && "Account Information"}
+                    {!["es", "en"].includes(language) && "Account Information"}
+                </h1>
                 <div className="mb-4">
-                    <label className="block font-semibold">Nombre de Usuario</label>
+                    <label className="block font-semibold">
+                        {language === "es" && "Nombre de Usuario"}
+                        {language === "en" && "Username"}
+                        {!["es", "en"].includes(language) && "Username"}
+                    </label>
                     <span>{name || "No disponible"}</span>
                 </div>
                 <div className="mb-4">
-                    <label className="block font-semibold">Correo Electrónico</label>
-                    <span>{email || "No disponible"}</span>
+                    <label className="block font-semibold">
+                        {language === "es" && "Correo Electrónico"}
+                        {language === "en" && "Email"}
+                        {!["es", "en"].includes(language) && "Email"}
+                    </label>
+                    <span>{email || (language === "es" ? "No disponible" : "Unavailable")}</span>
                 </div>
                 <div className="mb-4">
-                    <label className="block font-semibold">Número de Chats</label>
-                    <span>{chatCount !== null ? chatCount : "Cargando..."}</span>
+                    <label className="block font-semibold">
+                        {language === "es" && "Número de Chats"}
+                        {language === "en" && "Number of Chats"}
+                        {!["es", "en"].includes(language) && "Number of Chats"}
+                    </label>
+                    <span>{chatCount !== null ? chatCount : (language === "es" ? "Cargando..." : "Loading...")}</span>
                 </div>
                 <div className="mt-6 text-center">
                     <NavLink
                         to="/chat"
                         className="text-blue-600 dark:text-blue-400 hover:underline text-xl font-semibold"
                     >
-                        ← Atrás
+                        {language === "es" && "← Atrás"}
+                        {language === "en" && "← Back"}
+                        {!["es", "en"].includes(language) && "← Back"}
                     </NavLink>
                 </div>
             </div>

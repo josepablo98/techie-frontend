@@ -3,7 +3,7 @@ import { RootState } from "../store";
 import { NavLink } from "react-router-dom";
 
 export const Footer = () => {
-  const { theme } = useSelector((state: RootState) => state.settings);
+  const { theme, language } = useSelector((state: RootState) => state.settings);
 
   const footerClasses =
     theme === "dark"
@@ -15,19 +15,25 @@ export const Footer = () => {
       <div className="w-full flex justify-center px-4">
         <nav className="flex space-x-6">
           <NavLink to="/about" className="hover:underline">
-            Acerca de
+            {language === "en" && "About"}
+            {language === "es" && "Acerca de"}
+            {!["en", "es"].includes(language) && "Acerca de"}
           </NavLink>
           <NavLink to="/contact" className="hover:underline">
-            Contacto
+            {language === "en" && "Contact"}
+            {language === "es" && "Contacto"}
+            {!["en", "es"].includes(language) && "Contacto"}
           </NavLink>
           <NavLink to="/privacy" className="hover:underline">
-            Política de privacidad
+            {language === "en" && "Privacy Policy"}
+            {language === "es" && "Política de Privacidad"}
+            {!["en", "es"].includes(language) && "Política de Privacidad"}
           </NavLink>
         </nav>
       </div>
       <div className="border-t border-white mt-2 opacity-20"></div>
       <p className="text-center text-sm opacity-75 mt-1">
-        &copy; {new Date().getFullYear()} Techie. Todos los derechos reservados.
+        &copy; {new Date().getFullYear()} Techie. {language === "en" ? "All rights reserved." : "Todos los derechos reservados."}
       </p>
     </footer>
   );

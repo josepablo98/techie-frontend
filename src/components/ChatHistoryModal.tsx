@@ -8,11 +8,11 @@ import { RootState } from "../store";
 export const ChatHistoryModal = ({ open, onClose, chats }: ChatHistoryModalProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { theme } = useSelector((state : RootState) => state.settings);
+  const { theme, language } = useSelector((state : RootState) => state.settings);
 
   useEffect(() => {
     if (open) {
-      checkToken(dispatch);
+      checkToken({ dispatch });
     }
   }, [open, dispatch]);
 
@@ -33,7 +33,11 @@ export const ChatHistoryModal = ({ open, onClose, chats }: ChatHistoryModalProps
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className={`w-80 rounded shadow-lg ${modalClasses}`}>
         <div className="p-4 border-b border-gray-600">
-          <h2 className="text-xl font-semibold">Historial de Chats</h2>
+          <h2 className="text-xl font-semibold">
+            {language === "en" && "Chat History"}
+            {language === "es" && "Historial de Chats"}
+            {!["en", "es"].includes(language) && "Historial de Chats"}
+          </h2>
         </div>
         <ul className="max-h-64 overflow-y-auto">
           {chats.length > 0 ? (
@@ -50,7 +54,11 @@ export const ChatHistoryModal = ({ open, onClose, chats }: ChatHistoryModalProps
               </li>
             ))
           ) : (
-            <li className="p-2">No hay chats disponibles</li>
+            <li className="p-2">
+              {language === "en" && "No chats available."}
+              {language === "es" && "No hay chats disponibles."}
+              {!["en", "es"].includes(language) && "No hay chats disponibles."}
+            </li>
           )}
         </ul>
         <div className="p-2 flex justify-end">
@@ -60,7 +68,9 @@ export const ChatHistoryModal = ({ open, onClose, chats }: ChatHistoryModalProps
               theme === "dark" ? "bg-gray-700 text-gray-100 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"
             }`}
           >
-            Cerrar
+            {language === "en" && "Close"}
+            {language === "es" && "Cerrar"}
+            {!["en", "es"].includes(language) && "Cerrar"}
           </button>
         </div>
       </div>

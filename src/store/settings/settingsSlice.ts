@@ -18,8 +18,13 @@ export const settingsSlice = createSlice({
       if (payload?.language !== undefined) state.language = payload.language;
       if (payload?.detailLevel !== undefined) state.detailLevel = payload.detailLevel;
       if (payload?.tempChats !== undefined) state.tempChats = payload.tempChats;
+    },
+    clearSettings: (state) => {
+      state.theme = "light";
+      state.detailLevel = "simplified";
+      state.tempChats = false;
     }
-  },
+  }
 });
 
-export const { setSettings } = settingsSlice.actions;
+export const { setSettings, clearSettings } = settingsSlice.actions;
