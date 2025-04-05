@@ -1,5 +1,9 @@
 import { AppDispatch } from "../store";
 
+export interface DeleteAccountProps {
+    language: string;
+}
+
 export interface ChatFormProps {
     message: string;
     index: number;

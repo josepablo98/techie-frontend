@@ -1,6 +1,6 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getSettingsThunk } from "../store/settings/thunks";
+import { startGettingSettingsThunk } from "../store/settings/thunks";
 import { RootState, AppDispatch } from "../store";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LoadingPage } from "../pages/LoadingPage";
@@ -19,7 +19,7 @@ export const PrivateRouter = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    dispatch(getSettingsThunk({ language })).finally(() => {
+    dispatch(startGettingSettingsThunk({ language })).finally(() => {
       setIsLoading(false);
     })
 

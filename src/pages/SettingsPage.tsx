@@ -3,12 +3,13 @@ import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store";
 import { getChatsByUserId, deleteChat, checkToken, deleteAllChats } from "../helpers";
-import { updateSettingsThunk } from "../store/settings/thunks";
+import { startUpdatingSettingsThunk } from "../store/settings/thunks";
 import { Chat } from "../interfaces";
 import { NavLink } from "react-router-dom";
 import { LoadingPage } from "./LoadingPage";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { startDeletingAccount } from "../store/auth";
 
 const SettingsPage = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -82,7 +83,7 @@ const SettingsPage = () => {
 
     // Enviamos la actualización al backend y al store
     dispatch(
-      updateSettingsThunk({
+      startUpdatingSettingsThunk({
         theme: localForm.theme,
         language: localForm.language,
         detailLevel: localForm.detailLevel,
@@ -143,11 +144,60 @@ const SettingsPage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const firstConfirmation = await Swal.fire({
+      title: language === "es" ? "¿Estás seguro?" : "Are you sure?",
+      text: language === "es"
+        ? "Esta acción eliminará tu cuenta permanentemente. ¿Deseas continuar?"
+        : "This action will permanently delete your account. Do you want to proceed?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: language === "es" ? "Sí, continuar" : "Yes, proceed",
+      cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
+      customClass: {
+        popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
+        confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
+        cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+      },
+    });
+
+    if (firstConfirmation.isConfirmed) {
+      const secondConfirmation = await Swal.fire({
+        title: language === "es" ? "Confirmación final" : "Final confirmation",
+        text: language === "es"
+          ? "¿Estás completamente seguro? Esta acción no se puede deshacer."
+          : "Are you absolutely sure? This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: language === "es" ? "Sí, eliminar cuenta" : "Yes, delete account",
+        cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
+        customClass: {
+          popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
+          confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
+          cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+        },
+      });
+
+      if (secondConfirmation.isConfirmed) {
+        dispatch(startDeletingAccount({ language }));
+      }
+    }
+  }
+
   // Clases en base al theme
   const cardClasses =
     theme === "dark"
       ? "bg-gray-800 text-gray-100"
       : "bg-white text-black";
+
+
+  const deleteButtonClasses = theme === "dark"
+    ? "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+    : "px-4 py-2 bg-red-100 text-red-700 rounded border border-red-300 hover:bg-red-200";
+
+  const applyButtonClasses = theme === "dark"
+    ? "px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500"
+    : "px-4 py-2 rounded bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -155,7 +205,7 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold mb-4">
           {language === "es" && "Configuración"}
           {language === "en" && "Settings"}
-          {!["es", "en"].includes(language) && "Configuración"} 
+          {!["es", "en"].includes(language) && "Configuración"}
         </h1>
 
         <NavLink to="/chat" className="block mb-4 text-blue-600 hover:underline">
@@ -264,11 +314,73 @@ const SettingsPage = () => {
             />
           </div>
 
+
+          {chats && chats.length > 0 && (
+            <div className="border-t pt-4 mt-4">
+              <button
+                type="button"
+                className="flex items-center justify-between w-full font-semibold"
+                onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+              >
+                <span>
+                  {language === "es" && "Eliminar Chats"}
+                  {language === "en" && "Delete Chats"}
+                  {!["es", "en"].includes(language) && "Eliminar Chats"}
+                </span>
+                <span>{isAccordionOpen ? "▲" : "▼"}</span>
+              </button>
+              {isAccordionOpen && (
+                <ul className="mt-2 space-y-2">
+                  {chats.map((chat) => (
+                    <li key={chat.id} className="flex items-center justify-between border-b py-2">
+                      <span>{chat.title}</span>
+                      <button
+                        type="button"
+                        className={theme === "dark"
+                          ? "text-red-600 font-semibold hover:underline"
+                          : "text-red-700 font-semibold hover:underline"
+                        }
+                        onClick={() => handleDeleteChat(chat.id)}
+                      >
+                        {language === "es" && "Eliminar"}
+                        {language === "en" && "Delete"}
+                        {!["es", "en"].includes(language) && "Eliminar"}
+                      </button>
+                    </li>
+                  ))}
+                  <li className="flex justify-center mt-4">
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        className={deleteButtonClasses}
+                        onClick={handleDeleteAllChats}
+                      >
+                        {language === "es" && "Eliminar todos los chats"}
+                        {language === "en" && "Delete all chats"}
+                        {!["es", "en"].includes(language) && "Eliminar todos los chats"}
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              )}
+            </div>
+          )}
+          <div className="mt-6">
+            <button
+              type="button"
+              className={`${deleteButtonClasses} w-full`}
+              onClick={handleDeleteAccount}
+            >
+              {language === "es" && "Eliminar cuenta"}
+              {language === "en" && "Delete account"}
+              {!["es", "en"].includes(language) && "Eliminar cuenta"}
+            </button>
+          </div>
+
           <div className="flex items-center justify-between mt-6">
             <button
               type="submit"
-              className={`px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500 ${!hasChanges() ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              className={`${applyButtonClasses} w-full ${!hasChanges() ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={!hasChanges()}
             >
               {language === "es" && "Aplicar cambios"}
@@ -277,52 +389,6 @@ const SettingsPage = () => {
             </button>
           </div>
         </form>
-
-        {chats && chats.length > 0 && (
-          <div className="border-t pt-4 mt-4">
-            <button
-              type="button"
-              className="flex items-center justify-between w-full font-semibold"
-              onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-            >
-              <span>
-                {language === "es" && "Eliminar Chats"}
-                {language === "en" && "Delete Chats"}
-                {!["es", "en"].includes(language) && "Eliminar Chats"}
-              </span>
-              <span>{isAccordionOpen ? "▲" : "▼"}</span>
-            </button>
-            {isAccordionOpen && (
-              <ul className="mt-2 space-y-2">
-                {chats.map((chat) => (
-                  <li key={chat.id} className="flex items-center justify-between border-b py-2">
-                    <span>{chat.title}</span>
-                    <button
-                      className="text-red-600 font-semibold hover:underline"
-                      onClick={() => handleDeleteChat(chat.id)}
-                    >
-                      {language === "es" && "Eliminar"}
-                      {language === "en" && "Delete"}
-                      {!["es", "en"].includes(language) && "Eliminar"}
-                    </button>
-                  </li>
-                ))}
-                <li className="flex justify-center mt-4">
-                    <div className="mt-4">
-                    <button
-                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
-                      onClick={handleDeleteAllChats}
-                    >
-                      {language === "es" && "Eliminar todos los chats"}
-                      {language === "en" && "Delete all chats"}
-                      {!["es", "en"].includes(language) && "Eliminar todos los chats"}
-                    </button>
-                    </div>
-                </li>
-              </ul>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

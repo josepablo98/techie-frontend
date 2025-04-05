@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Swal from 'sweetalert2';
 import { clearSettings, setSettings } from '../settings';
 import { sendVerifyEmail } from '../../helpers';
+import { DeleteAccountProps } from '../../interfaces';
 
 
 export const startRegisteringWithEmailAndPassword = ({ email, password, name, language }: RegisterValuesFetchProps) => {
@@ -123,6 +124,35 @@ export const startLogout = () => {
       dispatch(clearSettings());
     } catch (error) {
       console.error("Error durante el logout:", error);
+    }
+  }
+}
+
+export const startDeletingAccount = ({ language }: DeleteAccountProps) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const response = await fetch("https://localhost:8080/auth/delete-account", {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": language,
+        },
+      });
+      const data = await response.json();
+
+      if (!data.ok) {
+        toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        const publicLanguage = localStorage.getItem("publicLanguage") || "es";
+        dispatch(setSettings({ language: publicLanguage }));
+        dispatch(logout({ message: "Cuenta eliminada" }));
+        dispatch(clearSettings());
+      }
+    } catch (error) {
+      console.error("Error eliminando la cuenta:", error);
+      toast.error("Error eliminando la cuenta");
     }
   }
 }

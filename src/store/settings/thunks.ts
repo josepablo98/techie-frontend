@@ -5,7 +5,7 @@ import { updateSettings, getSettings } from "../../helpers";
 import { GetSettingsThunkProps, UpdateSettingsThunkProps } from "../../interfaces";
 
 // Thunk para ACTUALIZAR ajustes (persistencia en DB + store)
-export const updateSettingsThunk = ({
+export const startUpdatingSettingsThunk = ({
     detailLevel,
     language,
     autoSaveChats,
@@ -40,7 +40,7 @@ export const updateSettingsThunk = ({
     };
 };
 
-export const getSettingsThunk = ({ language }: GetSettingsThunkProps) => {
+export const startGettingSettingsThunk = ({ language }: GetSettingsThunkProps) => {
     return async (dispatch: AppDispatch) => {
         try {
             const data = await getSettings({ language });
