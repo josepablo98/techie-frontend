@@ -2,12 +2,14 @@ import { toast } from "react-toastify"
 import { CheckTokenProps, RequestPasswordResetFetchProps, ResetPasswordFetchProps, sendVerifyEmailProps, VerifyEmailProps } from "../interfaces"
 import { login, startLogout } from "../store/auth"
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export const checkToken = async ({ dispatch } : CheckTokenProps) => {
- 
+
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const resp = await fetch('https://localhost:8080/auth/renew', {
+      const resp = await fetch(`${BACKEND_URL}/auth/renew`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -24,7 +26,7 @@ export const checkToken = async ({ dispatch } : CheckTokenProps) => {
 export const resetPassword = async ({formValues, token, language} : ResetPasswordFetchProps) => {
 
   try {
-    const response = await fetch('https://localhost:8080/auth/reset-password', {
+    const response = await fetch(`${BACKEND_URL}/auth/reset-password`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ export const resetPassword = async ({formValues, token, language} : ResetPasswor
 
 export const sendResetPassword = async ({ formValues, language } : RequestPasswordResetFetchProps) => {
   try {
-    const response = await fetch('https://localhost:8080/auth/request-password-reset', {
+    const response = await fetch(`${BACKEND_URL}/auth/request-password-reset`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +71,7 @@ export const sendResetPassword = async ({ formValues, language } : RequestPasswo
 export const verify = async ({ token, language } : VerifyEmailProps) => {
   let data;
   try {
-    const response = await fetch('https://localhost:8080/auth/verify-email', {
+    const response = await fetch(`${BACKEND_URL}/auth/verify-email`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +91,7 @@ export const verify = async ({ token, language } : VerifyEmailProps) => {
 
 export const sendVerifyEmail = async ({ email, language } : sendVerifyEmailProps)  => {
   try {
-    const response = await fetch('https://localhost:8080/auth/request-verified-email', {
+    const response = await fetch(`${BACKEND_URL}/auth/request-verified-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

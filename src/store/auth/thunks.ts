@@ -9,13 +9,16 @@ import { sendVerifyEmail } from '../../helpers';
 import { DeleteAccountProps } from '../../interfaces';
 
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+
 export const startRegisteringWithEmailAndPassword = ({ email, password, name, language }: RegisterValuesFetchProps) => {
   return async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
 
     try {
       const json = JSON.stringify({ email, password, name });
-      const response = await fetch('https://localhost:8080/auth/register', {
+      const response = await fetch(`${BACKEND_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +64,7 @@ export const startLoginWithEmailAndPassword = ({ email, password, language }: Lo
 
     try {
       const json = JSON.stringify({ email, password });
-      const response = await fetch('https://localhost:8080/auth/login', {
+      const response = await fetch(`${BACKEND_URL}/auth/login`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -108,7 +111,7 @@ export const startLoginWithEmailAndPassword = ({ email, password, language }: Lo
 export const startLogout = () => {
   return async (dispatch: AppDispatch) => {
     try {
-      await fetch("https://localhost:8080/auth/logout", {
+      await fetch(`${BACKEND_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -131,7 +134,7 @@ export const startLogout = () => {
 export const startDeletingAccount = ({ language }: DeleteAccountProps) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await fetch("https://localhost:8080/auth/delete-account", {
+      const response = await fetch(`${BACKEND_URL}/auth/delete-account`, {
         method: "DELETE",
         credentials: "include",
         headers: {

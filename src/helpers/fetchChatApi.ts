@@ -1,8 +1,11 @@
 import { DeleteAllChatsProps, DeleteChatProps, GeminiRequestProps, GetChatProps, GetChatsByUserIdProps, SaveNewChatProps, UpdateChatProps, UpdateTitleProps } from "../interfaces";
 
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export const saveNewChat = async ({ message, language }: SaveNewChatProps) => {
     try {
-        const resp = await fetch("https://localhost:8080/chat/create", {
+        const resp = await fetch(`${BACKEND_URL}/chat/create`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -20,7 +23,7 @@ export const saveNewChat = async ({ message, language }: SaveNewChatProps) => {
 
 export const updateChat = async ({ chatId, message, language }: UpdateChatProps) => {
     try {
-        const resp = await fetch(`https://localhost:8080/chat/update/${chatId}`, {
+        const resp = await fetch(`${BACKEND_URL}/chat/update/${chatId}`, {
             method: "PUT",
             credentials: "include",
             headers: {
@@ -37,7 +40,7 @@ export const updateChat = async ({ chatId, message, language }: UpdateChatProps)
 
 export const updateTitle = async ({ chatId, title, language }: UpdateTitleProps) => {
     try {
-        const resp = await fetch(`https://localhost:8080/chat/update-title/${chatId}`, {
+        const resp = await fetch(`${BACKEND_URL}/chat/update-title/${chatId}`, {
             method: "PUT",
             credentials: "include",
             headers: {
@@ -70,7 +73,7 @@ export const fetchGeminiApi = async ({ text, context, detailLevel, language }: G
 
 export const getChatsByUserId = async ({ language } : GetChatsByUserIdProps) => {
     try {
-        const resp = await fetch("https://localhost:8080/chat/getchats", {
+        const resp = await fetch(`${BACKEND_URL}/chat/getchats`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -87,7 +90,7 @@ export const getChatsByUserId = async ({ language } : GetChatsByUserIdProps) => 
 
 export const getChatByUserIdAndChatId = async ({ chatId , language}: GetChatProps) => {
     try {
-        const resp = await fetch(`https://localhost:8080/chat/getchat/${chatId}`, {
+        const resp = await fetch(`${BACKEND_URL}/chat/getchat/${chatId}`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -104,7 +107,7 @@ export const getChatByUserIdAndChatId = async ({ chatId , language}: GetChatProp
 
 export const deleteChat = async ({ chatId, language }: DeleteChatProps) => {
     try {
-        const resp = await fetch(`https://localhost:8080/chat/delete/${chatId}`, {
+        const resp = await fetch(`${BACKEND_URL}/chat/delete/${chatId}`, {
             method: "DELETE",
             credentials: "include",
             headers: {
@@ -121,7 +124,7 @@ export const deleteChat = async ({ chatId, language }: DeleteChatProps) => {
 
 export const deleteAllChats = async ({ language }: DeleteAllChatsProps) => {
     try {
-        const resp = await fetch("https://localhost:8080/chat/delete", {
+        const resp = await fetch(`${BACKEND_URL}/chat/delete`, {
             method: "DELETE",
             credentials: "include",
             headers: {

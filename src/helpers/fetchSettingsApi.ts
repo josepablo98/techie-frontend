@@ -1,9 +1,10 @@
 import { GetSettingsProps, UpdateSettingsProps } from "../interfaces";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const getSettings = async ({ language }: GetSettingsProps) => {
     try {
-        const resp = await fetch("https://localhost:8080/settings/get-settings", {
+        const resp = await fetch(`${BACKEND_URL}/settings/get-settings`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -20,7 +21,7 @@ export const getSettings = async ({ language }: GetSettingsProps) => {
 
 export const updateSettings = async ({ detailLevel, language, autoSaveChats, theme } : UpdateSettingsProps) => {
     try {
-        const resp = await fetch("https://localhost:8080/settings/update-settings", {
+        const resp = await fetch(`${BACKEND_URL}/settings/update-settings`, {
             method: "PUT",
             credentials: "include",
             headers: {
