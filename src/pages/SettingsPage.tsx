@@ -2,14 +2,14 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store";
-import { getChatsByUserId, deleteChat, checkToken, deleteAllChats } from "../helpers";
+import { getChatsByUserId, deleteChat, deleteAllChats } from "../helpers";
 import { startUpdatingSettingsThunk } from "../store/settings/thunks";
 import { Chat } from "../interfaces";
 import { NavLink } from "react-router-dom";
 import { LoadingPage } from "./LoadingPage";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import { startDeletingAccount } from "../store/auth";
+import { startCheckingToken, startDeletingAccount } from "../store/auth";
 
 const SettingsPage = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -32,7 +32,7 @@ const SettingsPage = () => {
 
   // Cargar chats
   useEffect(() => {
-    checkToken({ dispatch });
+    dispatch(startCheckingToken());
     setIsLoading(true);
     getChatsByUserId({ language })
       .then((data) => {
@@ -44,7 +44,7 @@ const SettingsPage = () => {
         setIsLoading(false);
       });
 
-  }, []);
+  }, [dispatch]);
 
   // Sincronizar el store -> formulario si se cambia en otra parte
   useEffect(() => {

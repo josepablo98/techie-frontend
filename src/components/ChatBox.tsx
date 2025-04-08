@@ -2,9 +2,10 @@ import { useForm } from "../hooks";
 import { ChatBoxProps, ChatFormProps } from "../interfaces";
 import { useEffect, useState, useRef } from "react";
 import { Message } from "./Message";
-import { checkToken, fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
+import { fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store";
+import { AppDispatch, RootState } from "../store";
+import { startCheckingToken } from "../store/auth";
 
 const SendIcon = () => (
   <svg
@@ -33,7 +34,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { formState, handleInputChange, handleSubmit } = useForm(initialState);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { theme, detailLevel, language, tempChats } = useSelector((state: RootState) => state.settings);
 
 
@@ -57,7 +58,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   }, [messages]);
 
   const onSubmit = async () => {
-    checkToken({ dispatch });
+    dispatch(startCheckingToken());
     if (formState.message === "") return;
 
     setIsLoading(true);

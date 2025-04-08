@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { startLogout } from "../store/auth";
+import { startCheckingToken, startLogout } from "../store/auth";
 import { AppDispatch, RootState } from "../store";
 import { ChatHistoryModal } from "./ChatHistoryModal";
-import { checkToken, getChatByUserIdAndChatId, getChatsByUserId } from "../helpers";
+import { getChatByUserIdAndChatId, getChatsByUserId } from "../helpers";
 import { toast } from "react-toastify";
 import { Chat } from "../interfaces";
 
@@ -45,7 +45,7 @@ export const Header = () => {
   };
 
   const openModal = async () => {
-    checkToken({ dispatch });
+    dispatch(startCheckingToken());
       try {
         const userChats = await getChatsByUserId({ language });
         if (userChats && userChats.length > 0) {
@@ -79,7 +79,7 @@ export const Header = () => {
 
   const handleNewChat = () => {
     navigate("/newchat", { replace: true });
-    checkToken({ dispatch });
+    dispatch(startCheckingToken());
     setIsMenuOpen(false);
   };
 

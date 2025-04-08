@@ -1,29 +1,62 @@
 import { toast } from "react-toastify"
-import { CheckTokenProps, RequestPasswordResetFetchProps, ResetPasswordFetchProps, sendVerifyEmailProps, VerifyEmailProps } from "../interfaces"
-import { login, startLogout } from "../store/auth"
+import { DeleteAccountProps, LoginValuesFetchProps, RegisterValuesFetchProps, RequestPasswordResetFetchProps, ResetPasswordFetchProps, sendVerifyEmailProps, VerifyEmailProps } from "../interfaces"
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export const checkToken = async ({ dispatch } : CheckTokenProps) => {
+export const checkToken = async () => {
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+  try {
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-      const resp = await fetch(`${BACKEND_URL}/auth/renew`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      if (!resp.ok) {
-        throw new Error(`HTTP error! status: ${resp.status}`);
-      }
-      const data = await resp.json();
-      dispatch(login(data));
-    } catch (error) {
-      dispatch(startLogout());
-    }
+    const resp = await fetch(`${BACKEND_URL}/auth/renew`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await resp.json();
+    return data;
+  } catch (error) {
+    console.error('Error durante la verificación del token:', error);
+  }
 };
 
-export const resetPassword = async ({formValues, token, language} : ResetPasswordFetchProps) => {
+export const registerUser = async ({ email, password, name, language }: RegisterValuesFetchProps) => {
+  try {
+    const json = JSON.stringify({ email, password, name });
+    const response = await fetch(`${BACKEND_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': language,
+      },
+      body: json
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error durante el registro:', error);
+  }
+}
+
+export const loginUser = async ({ email, language, password }: LoginValuesFetchProps) => {
+  try {
+    const json = JSON.stringify({ email, password });
+    const response = await fetch(`${BACKEND_URL}/auth/login`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': language,
+      },
+      body: json
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error durante el login:', error);
+  }
+}
+
+export const resetPassword = async ({ formValues, token, language }: ResetPasswordFetchProps) => {
 
   try {
     const response = await fetch(`${BACKEND_URL}/auth/reset-password`, {
@@ -46,7 +79,7 @@ export const resetPassword = async ({formValues, token, language} : ResetPasswor
   }
 }
 
-export const sendResetPassword = async ({ formValues, language } : RequestPasswordResetFetchProps) => {
+export const sendResetPassword = async ({ formValues, language }: RequestPasswordResetFetchProps) => {
   try {
     const response = await fetch(`${BACKEND_URL}/auth/request-password-reset`, {
       method: 'POST',
@@ -68,7 +101,7 @@ export const sendResetPassword = async ({ formValues, language } : RequestPasswo
   }
 }
 
-export const verify = async ({ token, language } : VerifyEmailProps) => {
+export const verify = async ({ token, language }: VerifyEmailProps) => {
   let data;
   try {
     const response = await fetch(`${BACKEND_URL}/auth/verify-email`, {
@@ -89,7 +122,7 @@ export const verify = async ({ token, language } : VerifyEmailProps) => {
   }
 }
 
-export const sendVerifyEmail = async ({ email, language } : sendVerifyEmailProps)  => {
+export const sendVerifyEmail = async ({ email, language }: sendVerifyEmailProps) => {
   try {
     const response = await fetch(`${BACKEND_URL}/auth/request-verified-email`, {
       method: 'POST',
@@ -109,5 +142,23 @@ export const sendVerifyEmail = async ({ email, language } : sendVerifyEmailProps
   } catch (error) {
     console.error('Error sending verification email:', error);
     toast.error('Error sending verification email');
+  }
+}
+
+export const deleteAccount = async ({ language }: DeleteAccountProps) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/auth/delete-account`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept-Language": language,
+      },
+    });
+    const data = await response.json();
+    return data;
+  }
+  catch (error) {
+    console.error("Error deleting account:", error);
   }
 }

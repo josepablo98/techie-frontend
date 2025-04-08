@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChatBox } from "../components";
 import { Layout } from "../layout/Layout";
-import { checkToken, getChatByUserIdAndChatId } from "../helpers";
+import { getChatByUserIdAndChatId } from "../helpers";
 import { ChatFormProps } from "../interfaces";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store";
+import { AppDispatch, RootState } from "../store";
+import { startCheckingToken } from "../store/auth";
 
 export const ChatPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [context, setContext] = useState<ChatFormProps[]>([]);
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const { language } = useSelector((state: RootState) => state.settings);
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkToken({ dispatch });
+    dispatch(startCheckingToken());
   }, [dispatch]);
 
   useEffect(() => {

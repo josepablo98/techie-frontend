@@ -1,9 +1,9 @@
 import { Router } from "./router/Router"
 import { useEffect } from "react"
-import { checkToken } from "./helpers"
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "./store";
 import { setSettings } from "./store/settings";
+import { startCheckingToken } from "./store/auth";
 
 export const App = () => {
 
@@ -15,8 +15,8 @@ export const App = () => {
 
     dispatch(setSettings({ Language: storedLanguage }));
 
-    checkToken({ dispatch });
-  }, [dispatch])
+    dispatch(startCheckingToken());
+  }, [dispatch]);
 
   return (
     <Router />

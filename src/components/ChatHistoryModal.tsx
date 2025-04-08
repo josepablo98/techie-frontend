@@ -1,18 +1,18 @@
 import { ChatHistoryModalProps } from "../interfaces";
-import { checkToken } from "../helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { RootState } from "../store";
+import { AppDispatch, RootState } from "../store";
+import { startCheckingToken } from "../store/auth";
 
 export const ChatHistoryModal = ({ open, onClose, chats }: ChatHistoryModalProps) => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { theme, language } = useSelector((state : RootState) => state.settings);
 
   useEffect(() => {
     if (open) {
-      checkToken({ dispatch });
+      dispatch(startCheckingToken());
     }
   }, [open, dispatch]);
 

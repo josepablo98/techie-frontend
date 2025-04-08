@@ -7,7 +7,10 @@ export interface RegisterValuesProps {
   password2: string;
 }
 
-export interface RegisterValuesFetchProps extends RegisterValuesProps {
+export interface RegisterValuesFetchProps {
+  name: string;
+  email: string;
+  password: string;
   language: string;
 }
 

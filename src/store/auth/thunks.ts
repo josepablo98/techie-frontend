@@ -1,33 +1,42 @@
-import { RegisterFetchProps, LoginFetchProps, RegisterValuesFetchProps, LoginValuesFetchProps } from './../../interfaces/public'; "../../interfaces";
+import { RegisterValuesFetchProps, LoginValuesFetchProps } from './../../interfaces/public'; "../../interfaces";
 import { checkingCredentials, login, logout } from "./authSlice";
 import { AppDispatch } from '../store';
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import Swal from 'sweetalert2';
 import { clearSettings, setSettings } from '../settings';
-import { sendVerifyEmail } from '../../helpers';
+import { checkToken, deleteAccount, loginUser, registerUser, sendVerifyEmail } from '../../helpers';
 import { DeleteAccountProps } from '../../interfaces';
 
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+export const startCheckingToken = () => {
+  return async (dispatch: AppDispatch) => {
+  
+    try {
+      const data = await checkToken();
+      if (!data.ok) {
+        return dispatch(startLogout());
+      } else {
+        console.log(data);
+        return dispatch(login(data));
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(startLogout());
+    }
+  }
+}
 
 
 export const startRegisteringWithEmailAndPassword = ({ email, password, name, language }: RegisterValuesFetchProps) => {
   return async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
 
-    try {
-      const json = JSON.stringify({ email, password, name });
-      const response = await fetch(`${BACKEND_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Language': language,
-        },
-        body: json
-      });
 
-      const data: RegisterFetchProps = await response.json() as RegisterFetchProps;
+    try {
+      const data = await registerUser({ email, password, name, language });
 
       if (!data.ok) {
         if (data.verified === false) {
@@ -46,14 +55,15 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name, la
         } else {
           toast.error(data.message);
         }
-        return dispatch(logout(data));
+        return dispatch(startLogout());
       }
 
       toast.info(data.message);
-      return dispatch(logout({ message: 'Debes verificar tu correo' }));
+      return dispatch(startLogout());
+
     } catch (error) {
       console.error('Error durante el registro:', error);
-      dispatch(logout({ message: 'El registro falló' }));
+      dispatch(startLogout());
     }
   }
 }
@@ -61,20 +71,8 @@ export const startRegisteringWithEmailAndPassword = ({ email, password, name, la
 export const startLoginWithEmailAndPassword = ({ email, password, language }: LoginValuesFetchProps) => {
   return async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
-
     try {
-      const json = JSON.stringify({ email, password });
-      const response = await fetch(`${BACKEND_URL}/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Language': language,
-        },
-        body: json
-      });
-
-      const data: LoginFetchProps = await response.json() as LoginFetchProps;
+      const data = await loginUser({ email, password, language });
 
       if (!data.ok) {
         if (data.verified === false) {
@@ -90,19 +88,20 @@ export const startLoginWithEmailAndPassword = ({ email, password, language }: Lo
               await sendVerifyEmail({ email, language })
             }
           });
-          return dispatch(logout(data));
+          return dispatch(startLogout());
         } else {
           toast.error(data.message);
-          return dispatch(logout(data));
+          return dispatch(startLogout());
         }
       }
 
       toast.success(data.message);
 
       dispatch(login(data))
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error durante el login:', error);
-      dispatch(logout({ message: 'Login falló' }));
+      dispatch(startLogout());
     }
   }
 }
@@ -121,7 +120,7 @@ export const startLogout = () => {
 
       const publicLanguage = localStorage.getItem("publicLanguage") || "es";
 
-      dispatch(setSettings({ language:  publicLanguage }));
+      dispatch(setSettings({ language: publicLanguage }));
 
       dispatch(logout({ message: "Sesión cerrada" }));
       dispatch(clearSettings());
@@ -134,23 +133,14 @@ export const startLogout = () => {
 export const startDeletingAccount = ({ language }: DeleteAccountProps) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/auth/delete-account`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept-Language": language,
-        },
-      });
-      const data = await response.json();
-
+      const data = await deleteAccount({ language });
       if (!data.ok) {
         toast.error(data.message);
       } else {
         toast.success(data.message);
         const publicLanguage = localStorage.getItem("publicLanguage") || "es";
         dispatch(setSettings({ language: publicLanguage }));
-        dispatch(logout({ message: "Cuenta eliminada" }));
+        dispatch(startLogout());
         dispatch(clearSettings());
       }
     } catch (error) {
