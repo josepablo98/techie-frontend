@@ -19,7 +19,6 @@ export const startCheckingToken = () => {
       if (!data.ok) {
         return dispatch(startLogout());
       } else {
-        console.log(data);
         return dispatch(login(data));
       }
     } catch (error) {

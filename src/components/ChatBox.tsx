@@ -59,7 +59,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
 
   const onSubmit = async () => {
     dispatch(startCheckingToken());
-    if (formState.message === "") return;
+    if (formState.message === "" || isLoading) return;
 
     setIsLoading(true);
     const newMessage: ChatFormProps = {
