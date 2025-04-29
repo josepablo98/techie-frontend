@@ -24,14 +24,14 @@ export const SelectLanguage = () => {
       className="border border-gray-300 rounded p-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <option value="es">
-        {language === "es" && "🇪🇸 Español"}
-        {language === "en" && "🇪🇸 Spanish"}
-        {!["es", "en"].includes(language) && "🇪🇸 Español"}
+        {language === "es" && "Español"}
+        {language === "en" && "Spanish"}
+        {!["es", "en"].includes(language) && "Español"}
       </option>
       <option value="en">
-        {language === "es" && "🇺🇸 Inglés"}
-        {language === "en" && "🇺🇸 English"}
-        {!["es", "en"].includes(language) && "🇺🇸 Inglés"}
+        {language === "es" && "Inglés"}
+        {language === "en" && "English"}
+        {!["es", "en"].includes(language) && "Inglés"}
       </option>
     </select>
   );

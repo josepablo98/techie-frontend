@@ -89,6 +89,7 @@ export interface ChatHistoryModalProps {
 export interface Chat {
   id: number;
   title: string;
+  lastDate: string;
 }
 
 export interface GetSettingsProps extends LanguageProps {}
