@@ -2,7 +2,12 @@ import { useForm } from "../hooks";
 import { ChatBoxProps, ChatFormProps } from "../interfaces";
 import { useEffect, useState, useRef } from "react";
 import { Message } from "./Message";
-import { fetchGeminiApi, saveNewChat, updateChat, updateTitle } from "../helpers";
+import {
+  fetchGeminiApi,
+  saveNewChat,
+  updateChat,
+  updateTitle,
+} from "../helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { startCheckingToken } from "../store/auth";
@@ -23,34 +28,22 @@ const SendIcon = () => (
   </svg>
 );
 
-const initialState: ChatFormProps = {
-  message: "",
-  index: -1,
-};
-
 export const ChatBox = ({ context = [] }: ChatBoxProps) => {
+  const dispatch: AppDispatch = useDispatch();
   const { email } = useSelector((state: RootState) => state.auth);
+  const { theme, detailLevel, language, tempChats } = useSelector(
+    (state: RootState) => state.settings
+  );
+
   const [messages, setMessages] = useState<ChatFormProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const { formState, handleInputChange, handleSubmit } = useForm(initialState);
-  const dispatch: AppDispatch = useDispatch();
-  const { theme, detailLevel, language, tempChats } = useSelector((state: RootState) => state.settings);
-
-
-
-
-  
+  const { formState, handleInputChange, handleSubmit } = useForm({
+    message: "",
+  });
 
   useEffect(() => {
-    if (context.length > 0) {
-      setMessages(context);
-      formState.index = context[context.length - 1].index;
-    } else {
-      setMessages([]);
-      formState.index = -1;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMessages(context || []);
   }, [context]);
 
   useEffect(() => {
@@ -59,89 +52,89 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
 
   const onSubmit = async () => {
     dispatch(startCheckingToken());
-    if (formState.message === "" || isLoading) return;
+
+    const userInput = formState.message.trim();
+    if (!userInput || isLoading) return;
 
     setIsLoading(true);
-    const newMessage: ChatFormProps = {
-      message: formState.message,
-      index: messages.length,
-    };
-    const newMessages = [...messages, newMessage];
-    setMessages(newMessages);
+    const cleanInput = userInput.replace(/^Q\$+/, ""); // limpia Q$ si lo tuviera
+    const prefixedUserMessage = userInput.startsWith("Q$") ? userInput : `Q$${cleanInput}`;
+    const newUserMessage: ChatFormProps = { message: prefixedUserMessage };
+    const updatedMessages = [...messages, newUserMessage];
+
+    setMessages(updatedMessages);
     formState.message = "";
 
-    if (newMessage.index === 0 && email && !tempChats) {
-      const data = await saveNewChat({ message: newMessage.message, language });
-      if (data && data.chatId) {
-        window.history.pushState(null, "", `/chat/${data.chatId}`);
+    const isFirstUserMessage =
+      updatedMessages.filter((m) => m.message.startsWith("Q$")).length === 1;
+
+    let chatId = Number(window.location.pathname.split("/")[2]);
+
+    if (isFirstUserMessage && email && !tempChats) {
+      const res = await saveNewChat({ message: prefixedUserMessage, language });
+      if (res?.chatId) {
+        chatId = res.chatId;
+        window.history.pushState(null, "", `/chat/${res.chatId}`);
       }
     } else if (email && !tempChats) {
-      await updateChat({
-        chatId: Number(window.location.pathname.split("/")[2]),
-        message: newMessage.message,
-        language
-      });
+      await updateChat({ chatId, message: prefixedUserMessage, language });
     }
 
-    let response;
-    if (newMessage.index === 0) {
-      response = await fetchGeminiApi({ text: newMessage.message, detailLevel, language });
-    } else {
-      response = await fetchGeminiApi({ text: newMessage.message, detailLevel, language, context: newMessages });
-    }
-    const chatTitle = response.response.split("//")[0].trim();
-    const chatMessage = response.response.split("//").slice(1).join(" ").trim();
-    const aiMessage: ChatFormProps = {
-      message: chatMessage,
-      index: newMessages.length,
-    };
+    const response = await fetchGeminiApi({
+      text: prefixedUserMessage,
+      detailLevel,
+      language,
+      context: updatedMessages,
+    });
 
-    if (newMessage.index === 0 && email) {
-      await updateTitle({
-        chatId: Number(window.location.pathname.split("/")[2]),
-        title: chatTitle,
-        language
-      });
-    }
-    if (email) {
-      await updateChat({
-        chatId: Number(window.location.pathname.split("/")[2]),
-        message: chatMessage,
-        language
-      });
-    }
+    const [titlePart, ...rest] = response.response.split("//");
+    const title = titlePart.trim();
+    const chatReply = rest.join(" ").trim();
+    const prefixedBotMessage = `A$${chatReply}`;
+    const botMessage: ChatFormProps = { message: prefixedBotMessage };
 
-    const finalMessages = [...newMessages, aiMessage];
+    const finalMessages = [...updatedMessages, botMessage];
     setMessages(finalMessages);
+
+    if (isFirstUserMessage && email && chatId) {
+      await updateTitle({ chatId, title, language });
+    }
+
+    if (email && chatId) {
+      await updateChat({ chatId, message: prefixedBotMessage, language });
+    }
+
     setIsLoading(false);
   };
 
-  // Contenedor principal (opcional, si quieres un color distinto que el global)
+  const cleanMessage = (text: string) =>
+    text.startsWith("Q$") || text.startsWith("A$") ? text.slice(2) : text;
+
+  const isBotResponse = (text: string) => text.startsWith("A$");
+
   const containerClasses =
     theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-white text-black";
-
-  // Barra inferior donde va el input
-  const barClasses =
-    theme === "dark"
-      ? "bg-gray-800"  // FONDO OSCURO
-      : "bg-gray-100"; // FONDO CLARO (o blanco si prefieres)
-  // Clases para el input en modo oscuro
+  const barClasses = theme === "dark" ? "bg-gray-800" : "bg-gray-100";
   const inputClasses =
     theme === "dark"
       ? "bg-gray-700 text-gray-100 placeholder-gray-400"
       : "bg-white text-black placeholder-gray-500";
 
   return (
-    <div className={`flex flex-col h-full max-h-screen overflow-hidden ${containerClasses}`}>
-      {/* Contenedor de mensajes */}
+    <div
+      className={`flex flex-col h-full max-h-screen overflow-hidden ${containerClasses}`}
+    >
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
-        {messages.map((message, index) => (
-          <Message key={index} text={message.message} isBotResponse={index % 2 !== 0} />
+        {messages.map((msg, i) => (
+          <Message
+            key={i}
+            text={cleanMessage(msg.message)}
+            isBotResponse={isBotResponse(msg.message)}
+          />
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Barra de envío */}
       <form
         onSubmit={(e) => handleSubmit(e, onSubmit)}
         className={`flex items-center p-2 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] h-14 ${barClasses}`}
@@ -149,7 +142,9 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
         <input
           type="text"
           name="message"
-          placeholder={language === "es" ? "Escribe un mensaje..." : "Type a message..."}
+          placeholder={
+            language === "es" ? "Escribe un mensaje..." : "Type a message..."
+          }
           autoComplete="off"
           className={`flex-1 mr-2 h-10 border border-gray-300 rounded px-2 disabled:bg-gray-100 ${inputClasses}`}
           value={formState.message}

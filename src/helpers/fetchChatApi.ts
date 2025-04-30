@@ -30,7 +30,7 @@ export const updateChat = async ({ chatId, message, language }: UpdateChatProps)
                 "Content-Type": "application/json",
                 "Accept-Language": language,
             },
-            body: JSON.stringify({ message }),
+            body: JSON.stringify({ message })
         });
         await resp.json();
     } catch (error) {

@@ -39,7 +39,6 @@ export interface DeleteAccountProps extends LanguageProps {}
 
 export interface ChatFormProps {
   message: string;
-  index: number;
 }
 
 export interface CheckTokenProps {
