@@ -19,7 +19,7 @@ export const getSettings = async ({ language }: GetSettingsProps) => {
     }
 }
 
-export const updateSettings = async ({ detailLevel, language, autoSaveChats, theme } : UpdateSettingsProps) => {
+export const updateSettings = async ({ detailLevel, language, autoSaveChats, theme, globalContext } : UpdateSettingsProps) => {
     try {
         const resp = await fetch(`${BACKEND_URL}/settings/update-settings`, {
             method: "PUT",
@@ -28,7 +28,7 @@ export const updateSettings = async ({ detailLevel, language, autoSaveChats, the
                 "Content-Type": "application/json",
                 "Accept-Language": language,
             },
-            body: JSON.stringify({ detailLevel, language, autoSaveChats, theme }),
+            body: JSON.stringify({ detailLevel, language, autoSaveChats, theme, globalContext }),
         });
         const data = await resp.json();
         return data;

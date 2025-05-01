@@ -10,6 +10,7 @@ import { LoadingPage } from "./LoadingPage";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { startCheckingToken, startDeletingAccount } from "../store/auth";
+import TextareaAutosize from "react-textarea-autosize";
 
 const SettingsPage = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -18,7 +19,7 @@ const SettingsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Leemos los ajustes actuales desde Redux
-  const { theme, language, detailLevel, tempChats } = useSelector(
+  const { theme, language, detailLevel, tempChats, globalContext } = useSelector(
     (state: RootState) => state.settings
   );
 
@@ -28,6 +29,7 @@ const SettingsPage = () => {
     language: language ?? "es",
     detailLevel: detailLevel ?? "simplified",
     tempChats: tempChats ?? false,
+    globalContext: undefined as string | undefined,
   });
 
   // Cargar chats
@@ -43,7 +45,6 @@ const SettingsPage = () => {
         console.error(err);
         setIsLoading(false);
       });
-
   }, [dispatch]);
 
   // Sincronizar el store -> formulario si se cambia en otra parte
@@ -53,6 +54,7 @@ const SettingsPage = () => {
       language: language ?? "es",
       detailLevel: detailLevel ?? "simplified",
       tempChats: tempChats ?? false,
+      globalContext: globalContext ?? undefined,
     });
   }, [theme, language, detailLevel, tempChats]);
 
@@ -61,25 +63,33 @@ const SettingsPage = () => {
   }
 
   // Manejador de inputs
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, type, value } = e.target;
     setLocalForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
+
+  const isGlobalContextValid = (localForm.globalContext?.length ?? 0) <= 500;
 
   const hasChanges = () => {
     return (
       localForm.theme !== (theme ?? "light") ||
       localForm.language !== (language ?? "es") ||
       localForm.detailLevel !== (detailLevel ?? "simplified") ||
-      localForm.tempChats !== (tempChats ?? false)
+      localForm.tempChats !== (tempChats ?? false) ||
+      localForm.globalContext !== (globalContext ?? undefined)
     );
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isGlobalContextValid) return;
 
     // Enviamos la actualización al backend y al store
     dispatch(
@@ -88,22 +98,34 @@ const SettingsPage = () => {
         language: localForm.language,
         detailLevel: localForm.detailLevel,
         autoSaveChats: localForm.tempChats ? 0 : 1,
+        globalContext: localForm.globalContext,
       })
     );
   };
-
   const handleDeleteChat = async (chatId: number) => {
     const result = await Swal.fire({
       title: language === "es" ? "¿Estás seguro?" : "Are you sure?",
-      text: language === "es" ? "Esta acción eliminará el chat permanentemente." : "This action will permanently delete the chat.",
+      text:
+        language === "es"
+          ? "Esta acción eliminará el chat permanentemente."
+          : "This action will permanently delete the chat.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: language === "es" ? "Sí, eliminar" : "Yes, delete",
       cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
       customClass: {
-        popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
-        confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
-        cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+        popup:
+          theme === "dark"
+            ? "bg-gray-800 text-gray-100"
+            : "bg-white text-black",
+        confirmButton:
+          theme === "dark"
+            ? "bg-red-600 hover:bg-red-500 text-white"
+            : "bg-red-500 hover:bg-red-400 text-white",
+        cancelButton:
+          theme === "dark"
+            ? "bg-gray-600 hover:bg-gray-500 text-white"
+            : "bg-gray-300 hover:bg-gray-200 text-black",
       },
     });
 
@@ -121,15 +143,28 @@ const SettingsPage = () => {
   const handleDeleteAllChats = async () => {
     const result = await Swal.fire({
       title: language === "es" ? "¿Estás seguro?" : "Are you sure?",
-      text: language === "es" ? "Esta acción eliminará todos los chats permanentemente." : "This action will permanently delete all chats.",
+      text:
+        language === "es"
+          ? "Esta acción eliminará todos los chats permanentemente."
+          : "This action will permanently delete all chats.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: language === "es" ? "Sí, eliminar todos" : "Yes, delete all",
+      confirmButtonText:
+        language === "es" ? "Sí, eliminar todos" : "Yes, delete all",
       cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
       customClass: {
-        popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
-        confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
-        cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+        popup:
+          theme === "dark"
+            ? "bg-gray-800 text-gray-100"
+            : "bg-white text-black",
+        confirmButton:
+          theme === "dark"
+            ? "bg-red-600 hover:bg-red-500 text-white"
+            : "bg-red-500 hover:bg-red-400 text-white",
+        cancelButton:
+          theme === "dark"
+            ? "bg-gray-600 hover:bg-gray-500 text-white"
+            : "bg-gray-300 hover:bg-gray-200 text-black",
       },
     });
 
@@ -147,34 +182,55 @@ const SettingsPage = () => {
   const handleDeleteAccount = async () => {
     const firstConfirmation = await Swal.fire({
       title: language === "es" ? "¿Estás seguro?" : "Are you sure?",
-      text: language === "es"
-        ? "Esta acción eliminará tu cuenta permanentemente. ¿Deseas continuar?"
-        : "This action will permanently delete your account. Do you want to proceed?",
+      text:
+        language === "es"
+          ? "Esta acción eliminará tu cuenta permanentemente. ¿Deseas continuar?"
+          : "This action will permanently delete your account. Do you want to proceed?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: language === "es" ? "Sí, continuar" : "Yes, proceed",
       cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
       customClass: {
-        popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
-        confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
-        cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+        popup:
+          theme === "dark"
+            ? "bg-gray-800 text-gray-100"
+            : "bg-white text-black",
+        confirmButton:
+          theme === "dark"
+            ? "bg-red-600 hover:bg-red-500 text-white"
+            : "bg-red-500 hover:bg-red-400 text-white",
+        cancelButton:
+          theme === "dark"
+            ? "bg-gray-600 hover:bg-gray-500 text-white"
+            : "bg-gray-300 hover:bg-gray-200 text-black",
       },
     });
 
     if (firstConfirmation.isConfirmed) {
       const secondConfirmation = await Swal.fire({
         title: language === "es" ? "Confirmación final" : "Final confirmation",
-        text: language === "es"
-          ? "¿Estás completamente seguro? Esta acción no se puede deshacer."
-          : "Are you absolutely sure? This action cannot be undone.",
+        text:
+          language === "es"
+            ? "¿Estás completamente seguro? Esta acción no se puede deshacer."
+            : "Are you absolutely sure? This action cannot be undone.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: language === "es" ? "Sí, eliminar cuenta" : "Yes, delete account",
+        confirmButtonText:
+          language === "es" ? "Sí, eliminar cuenta" : "Yes, delete account",
         cancelButtonText: language === "es" ? "Cancelar" : "Cancel",
         customClass: {
-          popup: theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black",
-          confirmButton: theme === "dark" ? "bg-red-600 hover:bg-red-500 text-white" : "bg-red-500 hover:bg-red-400 text-white",
-          cancelButton: theme === "dark" ? "bg-gray-600 hover:bg-gray-500 text-white" : "bg-gray-300 hover:bg-gray-200 text-black",
+          popup:
+            theme === "dark"
+              ? "bg-gray-800 text-gray-100"
+              : "bg-white text-black",
+          confirmButton:
+            theme === "dark"
+              ? "bg-red-600 hover:bg-red-500 text-white"
+              : "bg-red-500 hover:bg-red-400 text-white",
+          cancelButton:
+            theme === "dark"
+              ? "bg-gray-600 hover:bg-gray-500 text-white"
+              : "bg-gray-300 hover:bg-gray-200 text-black",
         },
       });
 
@@ -182,22 +238,21 @@ const SettingsPage = () => {
         dispatch(startDeletingAccount({ language }));
       }
     }
-  }
+  };
 
   // Clases en base al theme
   const cardClasses =
+    theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-black";
+
+  const deleteButtonClasses =
     theme === "dark"
-      ? "bg-gray-800 text-gray-100"
-      : "bg-white text-black";
+      ? "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+      : "px-4 py-2 bg-red-100 text-red-700 rounded border border-red-300 hover:bg-red-200";
 
-
-  const deleteButtonClasses = theme === "dark"
-    ? "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
-    : "px-4 py-2 bg-red-100 text-red-700 rounded border border-red-300 hover:bg-red-200";
-
-  const applyButtonClasses = theme === "dark"
-    ? "px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500"
-    : "px-4 py-2 rounded bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200";
+  const applyButtonClasses =
+    theme === "dark"
+      ? "px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500"
+      : "px-4 py-2 rounded bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -208,7 +263,10 @@ const SettingsPage = () => {
           {!["es", "en"].includes(language) && "Configuración"}
         </h1>
 
-        <NavLink to="/chat" className="block mb-4 text-blue-600 hover:underline">
+        <NavLink
+          to="/chat"
+          className="block mb-4 text-blue-600 hover:underline"
+        >
           {language === "es" && "← Atrás"}
           {language === "en" && "← Back"}
           {!["es", "en"].includes(language) && "← Atrás"}
@@ -223,10 +281,11 @@ const SettingsPage = () => {
             </label>
             <select
               name="theme"
-              className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
-                ? "bg-gray-700 text-gray-100 border-gray-600"
-                : "bg-white text-black border-gray-300"
-                }`}
+              className={`border border-gray-300 rounded w-full p-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-100 border-gray-600"
+                  : "bg-white text-black border-gray-300"
+              }`}
               value={localForm.theme}
               onChange={handleInputChange}
             >
@@ -251,10 +310,11 @@ const SettingsPage = () => {
             </label>
             <select
               name="language"
-              className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
-                ? "bg-gray-700 text-gray-100 border-gray-600"
-                : "bg-white text-black border-gray-300"
-                }`}
+              className={`border border-gray-300 rounded w-full p-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-100 border-gray-600"
+                  : "bg-white text-black border-gray-300"
+              }`}
               value={localForm.language}
               onChange={handleInputChange}
             >
@@ -279,10 +339,11 @@ const SettingsPage = () => {
             </label>
             <select
               name="detailLevel"
-              className={`border border-gray-300 rounded w-full p-2 ${theme === "dark"
-                ? "bg-gray-700 text-gray-100 border-gray-600"
-                : "bg-white text-black border-gray-300"
-                }`}
+              className={`border border-gray-300 rounded w-full p-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-100 border-gray-600"
+                  : "bg-white text-black border-gray-300"
+              }`}
               value={localForm.detailLevel}
               onChange={handleInputChange}
             >
@@ -314,6 +375,34 @@ const SettingsPage = () => {
             />
           </div>
 
+          <div className="mb4">
+            <label className="block mb-1 font-semibold">
+              {language === "es" && "Contexto Global"}
+              {language === "en" && "Global Context"}
+            </label>
+            <TextareaAutosize
+              name="globalContext"
+              className={`border border-gray-300 rounded w-full p-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-100 border-gray-600"
+                  : "bg-white text-black border-gray-300"
+              }`}
+              value={localForm.globalContext}
+              onChange={handleInputChange}
+              placeholder={
+                language === "es"
+                  ? "Introduce un contexto global..."
+                  : "Enter a global context..."
+              }
+            />
+            <p
+              className={`text-sm mt-1 ${
+                isGlobalContextValid ? "text-gray-500" : "text-red-500"
+              }`}
+            >
+              {localForm.globalContext?.length || 0}/500
+            </p>
+          </div>
 
           {chats && chats.length > 0 && (
             <div className="border-t pt-4 mt-4">
@@ -332,13 +421,17 @@ const SettingsPage = () => {
               {isAccordionOpen && (
                 <ul className="mt-2 space-y-2">
                   {chats.map((chat) => (
-                    <li key={chat.id} className="flex items-center justify-between border-b py-2">
+                    <li
+                      key={chat.id}
+                      className="flex items-center justify-between border-b py-2"
+                    >
                       <span>{chat.title}</span>
                       <button
                         type="button"
-                        className={theme === "dark"
-                          ? "text-red-600 font-semibold hover:underline"
-                          : "text-red-700 font-semibold hover:underline"
+                        className={
+                          theme === "dark"
+                            ? "text-red-600 font-semibold hover:underline"
+                            : "text-red-700 font-semibold hover:underline"
                         }
                         onClick={() => handleDeleteChat(chat.id)}
                       >
@@ -357,7 +450,8 @@ const SettingsPage = () => {
                       >
                         {language === "es" && "Eliminar todos los chats"}
                         {language === "en" && "Delete all chats"}
-                        {!["es", "en"].includes(language) && "Eliminar todos los chats"}
+                        {!["es", "en"].includes(language) &&
+                          "Eliminar todos los chats"}
                       </button>
                     </div>
                   </li>
@@ -380,8 +474,10 @@ const SettingsPage = () => {
           <div className="flex items-center justify-between mt-6">
             <button
               type="submit"
-              className={`${applyButtonClasses} w-full ${!hasChanges() ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={!hasChanges()}
+              className={`${applyButtonClasses} w-full ${
+                !hasChanges() || !isGlobalContextValid ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={!hasChanges() || !isGlobalContextValid}
             >
               {language === "es" && "Aplicar cambios"}
               {language === "en" && "Apply changes"}
@@ -392,6 +488,6 @@ const SettingsPage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default SettingsPage;

@@ -23,6 +23,7 @@ interface BaseUpdateSettings {
   theme?: string;
   detailLevel?: string;
   autoSaveChats?: number;
+  globalContext?: string | null;
 }
 
 // Para las interfaces de formulario de settings (comparten exactamente los mismos campos)
@@ -31,6 +32,7 @@ interface BaseSettingsForm {
   language: string;
   detailLevel: string;
   tempChats: boolean;
+  globalContext: string | null;
 }
 
 // Interfaces exportadas (sin modificar su API externa)
@@ -64,6 +66,7 @@ export interface UpdateChatProps extends ChatActionProps {
 
 export interface GeminiRequestProps extends DetailedLanguageProps {
   text: string;
+  globalContext?: string | null;
   context?: ChatFormProps[];
 }
 

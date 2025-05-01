@@ -6,6 +6,7 @@ const initialState: SettingsFormStore = {
   language: "es",
   detailLevel: "simplified",
   tempChats: false,
+  globalContext: null
 };
 
 export const settingsSlice = createSlice({
@@ -18,11 +19,13 @@ export const settingsSlice = createSlice({
       if (payload?.language !== undefined) state.language = payload.language;
       if (payload?.detailLevel !== undefined) state.detailLevel = payload.detailLevel;
       if (payload?.tempChats !== undefined) state.tempChats = payload.tempChats;
+      if (payload?.globalContext !== undefined) state.globalContext = payload.globalContext;
     },
     clearSettings: (state) => {
       state.theme = "light";
       state.detailLevel = "simplified";
       state.tempChats = false;
+      state.globalContext = null;
     }
   }
 });

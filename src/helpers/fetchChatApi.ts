@@ -55,14 +55,14 @@ export const updateTitle = async ({ chatId, title, language }: UpdateTitleProps)
     }
 };
 
-export const fetchGeminiApi = async ({ text, context, detailLevel, language }: GeminiRequestProps) => {
+export const fetchGeminiApi = async ({ text, context, detailLevel, language, globalContext }: GeminiRequestProps) => {
     try {
         const resp = await fetch("http://localhost:5000/chat/fetch", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ text, context, detailLevel, language }),
+            body: JSON.stringify({ text, context, detailLevel, language, globalContext }),
         });
         const data = await resp.json();
         return data;

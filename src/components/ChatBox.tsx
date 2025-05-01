@@ -31,7 +31,7 @@ const SendIcon = () => (
 export const ChatBox = ({ context = [] }: ChatBoxProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { email } = useSelector((state: RootState) => state.auth);
-  const { theme, detailLevel, language, tempChats } = useSelector(
+  const { theme, detailLevel, language, tempChats, globalContext } = useSelector(
     (state: RootState) => state.settings
   );
 
@@ -85,6 +85,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
       detailLevel,
       language,
       context: updatedMessages,
+      globalContext,
     });
 
     const [titlePart, ...rest] = response.response.split("//");

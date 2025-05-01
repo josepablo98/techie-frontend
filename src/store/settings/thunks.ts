@@ -10,6 +10,7 @@ export const startUpdatingSettingsThunk = ({
     language,
     autoSaveChats,
     theme,
+    globalContext
 }: UpdateSettingsThunkProps) => {
     return async (dispatch: AppDispatch) => {
         try {
@@ -18,6 +19,7 @@ export const startUpdatingSettingsThunk = ({
                 language,
                 autoSaveChats,
                 theme,
+                globalContext
             });
             if (!data.ok) {
                 return toast.error(data.message);
@@ -31,6 +33,7 @@ export const startUpdatingSettingsThunk = ({
                     language,
                     detailLevel,
                     tempChats: autoSaveChats === 0,
+                    globalContext
                 })
             );
         } catch (error) {
@@ -54,6 +57,7 @@ export const startGettingSettingsThunk = ({ language }: GetSettingsThunkProps) =
                         language: s.language,
                         detailLevel: s.detailLevel,
                         tempChats,
+                        globalContext: s.globalContext
                     })
                 );
             }
