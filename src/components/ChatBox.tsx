@@ -68,6 +68,9 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     const isFirstUserMessage =
       updatedMessages.filter((m) => m.message.startsWith("Q$")).length === 1;
 
+    const isFirstChatbotMessage =
+      updatedMessages.filter((m) => m.message.startsWith("A$")).length === 0;
+
     let chatId = Number(window.location.pathname.split("/")[2]);
 
     if (isFirstUserMessage && email && !tempChats) {
@@ -97,7 +100,7 @@ export const ChatBox = ({ context = [] }: ChatBoxProps) => {
     const finalMessages = [...updatedMessages, botMessage];
     setMessages(finalMessages);
 
-    if (isFirstUserMessage && email && chatId) {
+    if (isFirstChatbotMessage && email && chatId) {
       await updateTitle({ chatId, title, language });
     }
 
