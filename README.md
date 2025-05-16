@@ -1,4 +1,3 @@
-```markdown
 # Techie – Frontend (React)
 
 Este módulo implementa la interfaz de usuario del asistente conversacional, permitiendo al usuario registrarse, iniciar sesión, realizar consultas al chatbot, configurar sus preferencias y visualizar su historial de chats.
@@ -7,24 +6,25 @@ Este módulo implementa la interfaz de usuario del asistente conversacional, per
 
 - React.js + TypeScript
 - TailwindCSS (estilos y diseño responsive)
-- Redux Toolkit (estado global)
-- React Router DOM (navegación)
-- React.lazy y Suspense (Lazy Loading)
+- Redux Toolkit (gestión del estado global)
+- React Router DOM (navegación entre páginas)
+- React.lazy y Suspense (Lazy Loading para cargar componentes bajo demanda)
 
 ## Funcionalidades
 
-- Registro, login y logout
-- Visualización de chats guardados
+- Registro, login y logout de usuarios
+- Visualización del historial de chats guardados
 - Cambio de idioma (español o inglés)
-- Personalización de nivel de detalle
+- Personalización del nivel de detalle en las respuestas
 - Activación de chats temporales o persistentes
 - Modo claro y oscuro
+- Contexto global persistente entre conversaciones
 - Componentes reutilizables
-- Navegación protegida por sesión
+- Navegación protegida basada en sesión
 
 ## Scripts
 
 ```bash
-npm install     # instalar dependencias
-npm run dev     # entorno de desarrollo
-npm run build   # compilar producción
+npm install     # Instalar dependencias
+npm run dev     # Iniciar entorno de desarrollo
+npm run build   # Compilar para producción
